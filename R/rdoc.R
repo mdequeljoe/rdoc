@@ -52,6 +52,7 @@ Rdoc <- R6Class(
       private$n_sections <- length(s)
       private$current_section <- 2L
       private$out_(s[1L:2L])
+
       while(private$current_section != private$n_sections){
         p <- readline("")
         if (substr(p, 1L, 1L) == "q")
@@ -66,6 +67,7 @@ Rdoc <- R6Class(
     by_section = TRUE,
     n_sections = 0L,
     current_section = 0L,
+    get_help_file = getFromNamespace(".getHelpFile", "utils"),
     topic_ = function(tp){
       if (is.character(tp))
         return(tp)
@@ -74,7 +76,7 @@ Rdoc <- R6Class(
     tmp_rd_ = function(file){
       rd_file <- tempfile(fileext = ".rd")
       tools::Rd2txt(
-        utils:::.getHelpFile(file),
+        private$get_help_file(file),
         out = rd_file,
         options = list(
           underline_titles = TRUE,
