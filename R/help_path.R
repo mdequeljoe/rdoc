@@ -34,7 +34,7 @@ help_path <-
           stop("'topic' should be a name, length-one character vector or reserved word")
         topic <- stopic
       }
-      paths <- utils:::index.search(topic,
+      paths <- index_search(topic,
                                     find.package(if (is.null(package))
                                       loadedNamespaces()
                                       else
@@ -48,7 +48,7 @@ help_path <-
         for (lib in .libPaths()) {
           packages <- .packages(TRUE, lib)
           packages <- packages[is.na(match(packages, .packages()))]
-          paths <- c(paths, index.search(topic, file.path(lib,
+          paths <- c(paths, index_search(topic, file.path(lib,
                                                           packages)))
         }
         paths <- paths[nzchar(paths)]
@@ -56,3 +56,4 @@ help_path <-
       paths
   }
 
+index_search <- getFromNamespace("index.search", "utils")
