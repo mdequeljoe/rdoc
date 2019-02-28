@@ -33,7 +33,7 @@ Rdoc <- R6Class(
                           options,
                           package,
                           lib.loc) {
-      self$topic <- private$topic_(topic)
+      self$topic <- topic
       self$path <- help_path(self$topic) ### add in params..
       self$pkg <- basename(dirname(dirname(self$path)))
       self$opts <- options
