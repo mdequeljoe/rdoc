@@ -9,14 +9,14 @@ rd <- function(topic,
                options = rdoc_options(),
                package = NULL,
                lib.loc = NULL) {
-  rd_ <- Rdoc$new(topic, by_section, options, package, lib.loc)
-  rd_$show()
+  doc <- Rdoc$new(topic, by_section, options, package, lib.loc)
+  doc$show()
 }
 
 #' @export
 rd_example <- function(topic, options = rdoc_options()) {
-  rd <- Rdoc$new(topic, by_section = FALSE, options, package, lib.loc)
-  rd$show("examples")
+  doc <- Rdoc$new(topic, by_section = FALSE, options, package, lib.loc)
+  doc$show("examples")
 }
 
 
