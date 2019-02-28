@@ -59,7 +59,7 @@ Rdoc <- R6Class(
 
       while(private$current_section != private$n_sections){
         p <- readline("")
-        if (substr(p, 1L, 1L) == "q")
+        if (tolower(substr(p, 1L, 1L)) == "q")
           break
         private$current_section <- private$current_section + 1L
         private$out_(s[private$current_section])
