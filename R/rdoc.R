@@ -37,6 +37,8 @@ Rdoc <- R6Class(
                           lib.loc) {
       self$topic <- topic
       self$path <- help_path(self$topic) ### add in params..
+      if (!length(self$path))
+        stop("topic: ", topic, " not found")
       self$pkg <- basename(dirname(dirname(self$path)))
       self$opts <- options
       self$rd_file <- private$tmp_rd_(self$path)
