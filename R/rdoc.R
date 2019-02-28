@@ -19,6 +19,7 @@ rd_example <- function(topic, options = rdoc_options()) {
 }
 
 
+#' @importFrom tools Rd2txt
 #' @importFrom R6 R6Class
 Rdoc <- R6Class(
   "Rdoc",
@@ -75,7 +76,7 @@ Rdoc <- R6Class(
     },
     tmp_rd_ = function(file){
       rd_file <- tempfile(fileext = ".rd")
-      tools::Rd2txt(
+      Rd2txt(
         private$get_help_file(file),
         out = rd_file,
         options = list(
@@ -83,7 +84,7 @@ Rdoc <- R6Class(
           width = getOption('width') - 3L,
           code_quote = TRUE,
           item_bullet = self$opts$item_bullet
-        )) ##fix - assign
+        ))
       rd_file
     },
     list_sections = function(o) {
