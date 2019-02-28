@@ -1,13 +1,20 @@
 Package: rdoc
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Pretty print Rd files to the console
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
+Author: person("Matthew", "de Queljoe", email = "matthew.dequeljoe@gmail.com", role = c("aut", "cre")
+Maintainer: Matthew de Queljoe <matthew.dequeljoe@gmail.com>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
+Imports:
+  R6,
+  crayon,
+  cli,
+  prettycode,
+  tools,
+  utils
 RoxygenNote: 6.1.1
 
