@@ -13,8 +13,9 @@ rd <- function(topic,
   rd_$show()
 }
 
+#' @export
 rd_example <- function(topic, options = rdoc_options()) {
-  rd <- Rdoc(topic, by_section, options)
+  rd <- Rdoc$new(topic, by_section = FALSE, options, package, lib.loc)
   rd$show("examples")
 }
 
