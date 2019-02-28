@@ -80,7 +80,7 @@ Rdoc <- R6Class(
         out = rd_file,
         options = list(
           underline_titles = TRUE,
-          width = getOption('width'),
+          width = getOption('width') - 3L,
           code_quote = TRUE,
           item_bullet = self$opts$item_bullet
         )) ##fix - assign
