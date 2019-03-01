@@ -19,7 +19,6 @@ rd_example <- function(topic, options = rdoc_options()) {
   doc$show("examples")
 }
 
-
 #' @importFrom tools Rd2txt
 #' @importFrom R6 R6Class
 Rdoc <- R6Class(
@@ -109,6 +108,39 @@ Rdoc <- R6Class(
     append_ = function(l) Reduce(append, l)
   )
 )
+
+format_sections <- function(l, which = NULL){
+
+  if (!is.null(which))
+    l <- l[c(which)]
+
+  fm <- lapply(seq_along(l), function(i){
+    if (names(l)[i] %in% c("examples", "example", "usage"))
+      l[i] <<- format_as_code(l[i])
+    else
+      l[i] <<- format_as_text(l[i])
+  })
+
+  l
+}
+
+format_as_text <- function(l) {
+  for (i in 2:length(l)){
+    if (!nzchar(l[i]) || !grepl("[[:alnum:]]", l[i]))
+      next
+
+  }
+  l
+}
+format_as_code <- function(l) {
+
+  start <- min(which(!grepl("[[:alnum:]]", l)))
+  lh <- paste(l[1L:start], collapse = "\n")
+  lb <- paste(l[(start + 1L):length(l)], collapse = "\n")
+  lb <- prettycode::highlight(lb)
+  sprintf("%s\n%s", lh, lb)
+
+}
 
 
 
