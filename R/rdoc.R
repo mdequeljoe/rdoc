@@ -36,18 +36,8 @@ Rdoc <- R6Class(
 
       self$topic <- topic
       self$opts <- options
-      private$by_section = by_section
-
-      if (file.exists(topic) && grepl("\\.Rd?|\\.rd?", topic)){
-        self$path <- normalizePath(topic)
-        #check pkg?
-      } else {
-        self$path <- help_path(self$topic) ### add in params..
-        if (!length(self$path))
-          stop("topic: ", topic, " not found")
-        self$pkg <- basename(dirname(dirname(self$path)))
-        self$path <- private$get_help_file(self$path)
-      }
+      private$by_section <- by_section
+      private$find_rd_path()
       private$rd_to_text()
       invisible(self)
     },
@@ -85,6 +75,20 @@ Rdoc <- R6Class(
       if (is.character(tp))
         return(tp)
       deparse(substitute(tp))
+    },
+    find_rd_path = function(){
+      if (file.exists(self$topic) &&
+          grepl("\\.Rd?|\\.rd?", self$topic)){
+        self$path <- normalizePath(self$topic)
+        #check pkg?
+      } else {
+        self$path <- help_path(self$topic) ### add in params..
+        if (!length(self$path))
+          stop("topic: ", self$topic, " not found")
+        self$pkg <- basename(dirname(dirname(self$path)))
+        self$path <- private$get_help_file(self$path)
+      }
+      invisible(self)
     },
     rd_to_text = function(){
       tmp_ <- tempfile(fileext = ".txt")
