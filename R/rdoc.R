@@ -27,22 +27,29 @@ Rdoc <- R6Class(
     topic = NULL,
     path = NULL,
     pkg = NULL,
-    rd_file = NULL,
     opts = NULL,
     initialize = function(topic,
                           by_section,
                           options,
                           package,
                           lib.loc) {
+
       self$topic <- topic
-      self$path <- help_path(self$topic) ### add in params..
-      if (!length(self$path))
-        stop("topic: ", topic, " not found")
-      self$pkg <- basename(dirname(dirname(self$path)))
       self$opts <- options
-      self$rd_file <- private$tmp_rd_(self$path)
       private$by_section = by_section
-      private$rd_txt <- readLines(self$rd_file)
+
+      if (file.exists(topic) && grepl("\\.Rd?|\\.rd?", topic)){
+        self$path <- normalizePath(topic)
+        #check pkg?
+      } else {
+        self$path <- help_path(self$topic) ### add in params..
+        if (!length(self$path))
+          stop("topic: ", topic, " not found")
+        self$pkg <- basename(dirname(dirname(self$path)))
+        self$path <- private$get_help_file(self$path)
+      }
+      private$rd_to_text()
+      invisible(self)
     },
     show = function(which = NULL){
 
@@ -68,7 +75,7 @@ Rdoc <- R6Class(
   ),
   private = list(
     rd_txt = NULL,
-    rd_txt_list = NULL,
+    rd_sections = NULL,
     rd_fmt = NULL,
     by_section = TRUE,
     n_sections = 0L,
@@ -79,18 +86,20 @@ Rdoc <- R6Class(
         return(tp)
       deparse(substitute(tp))
     },
-    tmp_rd_ = function(file){
-      rd_file <- tempfile(fileext = ".rd")
+    rd_to_text = function(){
+      tmp_ <- tempfile(fileext = ".txt")
       Rd2txt(
-        private$get_help_file(file),
-        out = rd_file,
+        self$path,
+        out = tmp_,
         options = list(
           underline_titles = TRUE,
           width = getOption('width') - 3L,
           code_quote = TRUE,
           item_bullet = self$opts$item_bullet
-        ))
-      rd_file
+        )
+      )
+      private$rd_txt <- readLines(tmp_)
+      invisible(self)
     },
     list_sections = function() {
       o <- private$rd_txt
@@ -106,7 +115,7 @@ Rdoc <- R6Class(
         o[h:(headers[i + 1] - 1L)]
       })
       names(sections) <- nm
-      private$rd_txt_list <- sections
+      private$rd_sections <- sections
       invisible(self)
     },
     out_ = function(s) cat(paste(private$append_(s), collapse = "\n")),
@@ -115,7 +124,7 @@ Rdoc <- R6Class(
 )
 
 Rdoc$set("private", "format_sections", function(which = NULL){
-  l <- private$rd_txt_list
+  l <- private$rd_sections
   if (!is.null(which))
     l <- l[c(which)]
   fm <- lapply(seq_along(l), function(i){
