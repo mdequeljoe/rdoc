@@ -45,11 +45,12 @@ Rdoc <- R6Class(
       private$rd_txt <- readLines(self$rd_file)
     },
     show = function(which = NULL){
-      s <- private$list_sections(private$rd_txt)
 
-      if (!is.null(which))
-        return(private$out_(s[[which]]))
-      if (!private$by_section || !interactive())
+      private$list_sections()
+      private$format_sections(which)
+      s <- private$rd_fmt
+
+      if (!is.null(which) || !private$by_section || !interactive())
         return(private$out_(s))
 
       private$n_sections <- length(s)
@@ -67,6 +68,8 @@ Rdoc <- R6Class(
   ),
   private = list(
     rd_txt = NULL,
+    rd_txt_list = NULL,
+    rd_fmt = NULL,
     by_section = TRUE,
     n_sections = 0L,
     current_section = 0L,
@@ -89,7 +92,8 @@ Rdoc <- R6Class(
         ))
       rd_file
     },
-    list_sections = function(o) {
+    list_sections = function() {
+      o <- private$rd_txt
       headers <- which(grepl("^_\b", o))
       #on error?
       nm <- character(length(headers))
@@ -102,44 +106,41 @@ Rdoc <- R6Class(
         o[h:(headers[i + 1] - 1L)]
       })
       names(sections) <- nm
-      sections
+      private$rd_txt_list <- sections
+      invisible(self)
     },
     out_ = function(s) cat(paste(private$append_(s), collapse = "\n")),
     append_ = function(l) Reduce(append, l)
   )
 )
 
-format_sections <- function(l, which = NULL){
-
+Rdoc$set("private", "format_sections", function(which = NULL){
+  l <- private$rd_txt_list
   if (!is.null(which))
     l <- l[c(which)]
-
   fm <- lapply(seq_along(l), function(i){
-    if (names(l)[i] %in% c("examples", "example", "usage"))
-      l[i] <<- format_as_code(l[i])
-    else
-      l[i] <<- format_as_text(l[i])
+    s <- l[[i]]
+    if (names(l)[i] %in% c("examples", "example", "usage")){
+      s[2:length(s)] <- highlight(s[2:length(s)], style = self$opts$code_style)
+      return(s)
+    }
+    s
   })
+  names(fm) <- names(l)
+  private$rd_fmt <- fm
+  invisible(self)
+})
 
-  l
-}
+
+
 
 format_as_text <- function(l) {
-  for (i in 2:length(l)){
-    if (!nzchar(l[i]) || !grepl("[[:alnum:]]", l[i]))
-      next
-
-  }
+  # for (i in 2:length(l)){
+  #   if (!nzchar(l[i]) || !grepl("[[:alnum:]]", l[i]))
+  #     next
+  #
+  # }
   l
-}
-format_as_code <- function(l) {
-
-  start <- min(which(!grepl("[[:alnum:]]", l)))
-  lh <- paste(l[1L:start], collapse = "\n")
-  lb <- paste(l[(start + 1L):length(l)], collapse = "\n")
-  lb <- prettycode::highlight(lb)
-  sprintf("%s\n%s", lh, lb)
-
 }
 
 
@@ -156,14 +157,14 @@ rdoc_options <- function(pkg_header = cli::rule,
                          title = crayon::bold,
                          section_titles = crayon::underline,
                          arg_params = crayon::underline,
-                         code = prettycode::highlight,
+                         code_style = prettycode::default_style(),
                          item_bullet = cli::symbol$bullet) {
   list(
     pkg_header = pkg_header,
     title = title,
     section_titles = section_titles,
     arg_params = arg_params,
-    code = code,
+    code_style = code_style,
     item_bullet = item_bullet
   )
 }
