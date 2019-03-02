@@ -133,9 +133,10 @@ Rdoc$set("private", "format_sections", function(which = NULL){
     l <- l[c(which)]
   fm <- lapply(seq_along(l), function(i){
     s <- l[[i]]
-    if (names(l)[i] %in% c("examples", "example", "usage")){
-      s[2:length(s)] <- highlight(s[2:length(s)], style = self$opts$code_style)
-      return(s)
+    s[2:length(s)] <- if (names(l)[i] %in% c("examples", "example", "usage")){
+      highlight(s[2:length(s)], style = self$opts$code_style)
+    } else {
+      format_as_text(s[2:length(s)])
     }
     s
   })
@@ -144,19 +145,44 @@ Rdoc$set("private", "format_sections", function(which = NULL){
   invisible(self)
 })
 
+format_as_text <- function(v) {
+  if (has_bold(v))
+    v <- fmt_bold(v)
 
+  if (has_italic(v))
+    v <- fmt_italic(v)
 
+  if (has_code(v))
+    v <- fmt_inline_code(v)
 
-format_as_text <- function(l) {
-  # for (i in 2:length(l)){
-  #   if (!nzchar(l[i]) || !grepl("[[:alnum:]]", l[i]))
-  #     next
-  #
-  # }
-  l
+  v
 }
 
-
+fmt_sym <- function(sym, open, close) {
+  j <- 1
+  function(v) {
+    for (i in seq_along(v)) {
+      s <- strsplit(v[i], "")[[1L]]
+      for (k in seq_along(s)) {
+        if (!s[k] %in% sym)
+          next
+        if (j %% 2 != 0)
+          s[k] <- open
+        else
+          s[k] <- close
+        j <- j + 1
+      }
+      v[i] <- paste(s, collapse = "")
+    }
+    v
+  }
+}
+fmt_bold <- fmt_sym("*", open = "\033[1m", close = "\033[22m")
+fmt_italic <- fmt_sym("_", open = "\033[3m", close = "\033[23m")
+fmt_inline_code <- fmt_sym(c("‘", "’"), open = "\033[36m", close = "\033[39m")
+has_bold <- function(l) any(grepl("\\*", l))
+has_italic <- function(l) any(grepl("_", l))
+has_code <- function(l) any(grepl("‘|’", l))
 
 #' R doc options
 #'
