@@ -158,31 +158,61 @@ format_as_text <- function(v) {
   v
 }
 
+
+
 fmt_sym <- function(sym, open, close) {
   j <- 1
+  valid_sym <- function(o){
+    is.character(o) && !length(o) ||
+      is.na(o) ||
+      grepl("[[:space:]]|[[:punct:]]", o)
+  }
+  check_last_ <- function(spos){
+    if (!length(spos))
+      return(0L)
+    spos
+  }
   function(v) {
+
     for (i in seq_along(v)) {
       s <- strsplit(v[i], "")[[1L]]
+      sym_pos <- integer(length(s))
       for (k in seq_along(s)) {
+
         if (!s[k] %in% sym)
           next
-        if (j %% 2 != 0)
-          s[k] <- open
-        else
-          s[k] <- close
-        j <- j + 1
+
+        if (j %% 2 != 0){
+          if (valid_sym(s[k - 1]) &&
+              check_last_(sym_pos[k - 1]) != 2L){
+            s[k] <- open
+            sym_pos[k] <- 1L
+            j <- j + 1
+          }
+        }
+        else {
+          if (valid_sym(s[k + 1])){
+            s[k] <- close
+            sym_pos[k] <- 2L
+            j <- j + 1
+          }
+        }
+
       }
       v[i] <- paste(s, collapse = "")
     }
     v
   }
 }
+
+
 fmt_bold <- fmt_sym("*", open = "\033[1m", close = "\033[22m")
 fmt_italic <- fmt_sym("_", open = "\033[3m", close = "\033[23m")
 fmt_inline_code <- fmt_sym(c("‘", "’"), open = "\033[36m", close = "\033[39m")
-has_bold <- function(l) any(grepl("\\*", l))
-has_italic <- function(l) any(grepl("_", l))
-has_code <- function(l) any(grepl("‘|’", l))
+
+has_italic <- function(v) any(grepl("\\<_|_\\>", v))
+has_bold <- function(v) any(grepl("[\\<*]|[*\\>]", v))
+has_code <- function(l) any(grepl("\\<‘|’\\>", v))
 
 #' R doc options
 #'
