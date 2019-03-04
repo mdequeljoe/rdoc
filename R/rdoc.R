@@ -101,7 +101,7 @@ Rdoc <- R6Class(
       private$orig_txt <- if (inherits(self$path, "Rd"))
         as.character(self$path)
       else
-        as.character(parse_Rd(self$path))
+        as.character(parse_Rd(self$path, permissive = TRUE))
     },
     rd_to_text = function(){
       tmp_ <- tempfile(fileext = ".txt")
