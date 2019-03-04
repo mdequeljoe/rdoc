@@ -19,7 +19,7 @@ rd_example <- function(topic, options = rdoc_options()) {
   doc$show("examples")
 }
 
-#' @importFrom tools Rd2txt
+#' @importFrom tools Rd2txt parse_Rd
 #' @importFrom R6 R6Class
 Rdoc <- R6Class(
   "Rdoc",
@@ -66,7 +66,7 @@ Rdoc <- R6Class(
     }
   ),
   private = list(
-    rd_file_txt = NULL, #original rd markup
+    orig_txt = NULL,
     rd_txt = NULL,
     rd_sections = NULL,
     rd_fmt = NULL,
@@ -83,18 +83,22 @@ Rdoc <- R6Class(
       if (file.exists(self$topic) &&
           grepl("\\.Rd?|\\.rd?", self$topic)){
         self$path <- normalizePath(self$topic)
-        private$rd_file_txt <- readLines(self$path)
-        #check pkg?
       } else {
         self$path <- help_path(self$topic) ### add in params..
         if (!length(self$path))
           stop("topic: ", self$topic, " not found")
         self$pkg <- basename(dirname(dirname(self$path)))
         self$path <- private$get_help_file(self$path)
-        private$rd_file_txt <- self$path
       }
 
+      private$rd_orig_text()
       invisible(self)
+    },
+    rd_orig_text = function(){
+      private$orig_txt <- if (inherits(self$path, "Rd"))
+        as.character(self$path)
+      else
+        as.character(parse_Rd(self$path))
     },
     rd_to_text = function(){
       tmp_ <- tempfile(fileext = ".txt")
