@@ -44,8 +44,10 @@ Rdoc <- R6Class(
     show = function(which = NULL){
 
       private$list_sections()
-      private$format_sections(which)
-      s <- private$rd_fmt
+      #private$replace_formatting()
+      private$format_code_sections()
+
+      s <- private$rd_sections
 
       if (!is.null(which) || !private$by_section || !interactive())
         return(private$out_(s))
@@ -131,19 +133,20 @@ Rdoc <- R6Class(
   )
 )
 
-Rdoc$set("private", "format_sections", function(which = NULL){
-  l <- private$rd_sections
-  if (!is.null(which))
-    l <- l[c(which)]
-  fm <- lapply(seq_along(l), function(i){
-    s <- l[[i]]
-    s[2:length(s)] <- if (names(l)[i] %in% c("examples", "example", "usage")){
+Rdoc$set("private", "format_code_sections", function(which = NULL){
+
+  code_sections <- c("examples", "example", "usage")
+
+  fm <- lapply(code_sections, function(d){
+    if (is.null(s <- private$rd_sections[[d]]))
+      return(NULL)
+
+    s[2:length(s)] <-
       highlight(s[2:length(s)], style = self$opts$code_style)
-    }
-    s
+
+    private$rd_sections[[d]] <<- s
   })
-  names(fm) <- names(l)
-  private$rd_fmt <- fm
+
   invisible(self)
 })
 
