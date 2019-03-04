@@ -35,7 +35,6 @@ Rdoc <- R6Class(
                           package,
                           lib.loc) {
 
-
       self$topic <- topic
       self$opts <- options
       private$by_section <- by_section
@@ -47,7 +46,6 @@ Rdoc <- R6Class(
     show = function(which = NULL){
 
       private$list_sections()
-      #private$replace_formatting()
       private$format_code_sections()
 
       s <- private$rd_sections
@@ -55,16 +53,17 @@ Rdoc <- R6Class(
       if (!is.null(which) || !private$by_section || !interactive())
         return(private$out_(s))
 
-      private$n_sections <- length(s)
-      private$current_section <- 2L
+      n <- length(s)
+      i <- 2L
+
       private$out_(s[1L:2L])
 
-      while(private$current_section != private$n_sections){
+      while(i < n){
         p <- readline("")
         if (tolower(substr(p, 1L, 1L)) == "q")
           break
-        private$current_section <- private$current_section + 1L
-        private$out_(s[private$current_section])
+        i <- i + 1
+        private$out_(s[i])
       }
     }
   ),
@@ -74,8 +73,6 @@ Rdoc <- R6Class(
     rd_sections = NULL,
     rd_fmt = NULL,
     by_section = TRUE,
-    n_sections = 0L,
-    current_section = 0L,
     get_help_file = getFromNamespace(".getHelpFile", "utils"),
     topic_ = function(tp){
       if (is.character(tp))
@@ -178,7 +175,6 @@ Rdoc$set("private", "check_italic", function(){
 
   invisible(self)
 })
-
 
 Rdoc$set("private", "check_bold", function(){
 
