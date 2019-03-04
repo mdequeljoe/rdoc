@@ -28,16 +28,19 @@ Rdoc <- R6Class(
     path = NULL,
     pkg = NULL,
     opts = NULL,
+    rd_tmp = NULL,
     initialize = function(topic,
                           by_section,
                           options,
                           package,
                           lib.loc) {
 
+
       self$topic <- topic
       self$opts <- options
       private$by_section <- by_section
       private$find_rd_path()
+      private$replace_text_formats()
       private$rd_to_text()
       invisible(self)
     },
@@ -103,7 +106,7 @@ Rdoc <- R6Class(
     rd_to_text = function(){
       tmp_ <- tempfile(fileext = ".txt")
       Rd2txt(
-        self$path,
+        self$rd_tmp,
         out = tmp_,
         options = list(
           underline_titles = TRUE,
@@ -154,7 +157,69 @@ Rdoc$set("private", "format_code_sections", function(){
   invisible(self)
 })
 
+Rdoc$set("private", "replace_text_formats", function(){
 
+  private$check_italic()
+  private$check_bold()
+  # private$check_code()
+  # private$check_squotes()
+  self$rd_tmp <- tempfile(fileext = ".Rd")
+  o <- paste0(private$orig_txt, collapse = "")
+  write(o, file = self$rd_tmp)
+  invisible(self)
+})
+
+Rdoc$set("private", "check_italic", function(){
+
+  m <- which(private$orig_txt == "\\emph")
+  if (length(m))
+    private$orig_txt <-
+      replace_italic(private$orig_txt, m)
+
+  invisible(self)
+})
+
+
+Rdoc$set("private", "check_bold", function(){
+
+  m <- which(private$orig_txt == "\\bold")
+  if (length(m))
+    private$orig_txt <-
+      replace_bold(private$orig_txt, m)
+
+  invisible(self)
+})
+
+replace_sym <- function(sym, replace_open, replace_close){
+  function(v, match_sym){
+
+    rm_id <- integer(length(v))
+
+    for (i in match_sym){
+
+      v[i] <- replace_open
+      rm_id[i + 1] <- 1L
+      open <- 2L
+      j <- i + 2
+      found_close <- FALSE
+      while(!found_close){
+
+        if (open %% 2 == 0 && v[j] == "}"){
+          v[j] <- replace_close
+          found_close <- TRUE
+        }
+        if (v[j] %in% c("{", "}"))
+          open <- open + 1
+
+        j <- j + 1
+      }
+    }
+    v[-which(rm_id == 1L)]
+  }
+}
+
+replace_italic <- replace_sym("\\emph", "\033[3m", "\033[23m")
+replace_bold <- replace_sym("\\bold", "\033[1m", "\033[22m")
 
 #' R doc options
 #'
