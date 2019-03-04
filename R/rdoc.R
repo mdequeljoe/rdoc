@@ -133,7 +133,7 @@ Rdoc <- R6Class(
   )
 )
 
-Rdoc$set("private", "format_code_sections", function(which = NULL){
+Rdoc$set("private", "format_code_sections", function(){
 
   code_sections <- c("examples", "example", "usage")
 
