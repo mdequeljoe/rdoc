@@ -102,7 +102,7 @@ Rdoc <- R6Class(
       } else {
         prd <- parse_Rd(self$path)
         private$orig_txt <- as.character(prd)
-        private$orig_txt_dp <- as.character(self$path, deparse = TRUE)
+        private$orig_txt_dp <- as.character(prd, deparse = TRUE)
       }
       private$orig_txt <-
         replace_encoding(private$orig_txt, private$orig_txt_dp)
@@ -165,8 +165,8 @@ Rdoc$set("private", "format_code_sections", function(){
 
 Rdoc$set("private", "replace_text_formats", function(){
 
-  private$check_italic()
-  private$check_bold()
+  #private$check_italic()
+  #private$check_bold()
   # private$check_code()
   # private$check_squotes()
   self$rd_tmp <- tempfile(fileext = ".Rd")
