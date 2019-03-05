@@ -69,6 +69,7 @@ Rdoc <- R6Class(
   ),
   private = list(
     orig_txt = NULL,
+    orig_txt_dp = NULL,
     rd_txt = NULL,
     rd_sections = NULL,
     rd_fmt = NULL,
@@ -95,10 +96,18 @@ Rdoc <- R6Class(
       invisible(self)
     },
     rd_orig_text = function(){
-      private$orig_txt <- if (inherits(self$path, "Rd"))
-        as.character(self$path)
-      else
-        as.character(parse_Rd(self$path, permissive = TRUE))
+      if (inherits(self$path, "Rd")){
+        private$orig_txt <- as.character(self$path)
+        private$orig_txt_dp <- as.character(self$path, deparse = TRUE)
+      } else {
+        prd <- parse_Rd(self$path)
+        private$orig_txt <- as.character(prd)
+        private$orig_txt_dp <- as.character(self$path, deparse = TRUE)
+      }
+      private$orig_txt <-
+        replace_encoding(private$orig_txt, private$orig_txt_dp)
+
+      invisible(self)
     },
     rd_to_text = function(){
       tmp_ <- tempfile(fileext = ".txt")
@@ -161,8 +170,8 @@ Rdoc$set("private", "replace_text_formats", function(){
   # private$check_code()
   # private$check_squotes()
   self$rd_tmp <- tempfile(fileext = ".Rd")
-  o <- paste0(private$orig_txt, collapse = "")
-  write(o, file = self$rd_tmp)
+  cat(private$orig_txt, "\n", sep = "", file = self$rd_tmp)
+
   invisible(self)
 })
 
@@ -216,6 +225,15 @@ replace_sym <- function(sym, replace_open, replace_close){
 
 replace_italic <- replace_sym("\\emph", "\033[3m", "\033[23m")
 replace_bold <- replace_sym("\\bold", "\033[1m", "\033[22m")
+replace_encoding <- function(k, d){
+  elines <- which(k != d)
+  if (!length(elines))
+    return(k)
+  elines <- elines[grepl("\\\\n|\\\\t|\\\\v|\\\\r|%", k[elines])]
+  k[elines] <- d[elines]
+  k
+}
+
 
 #' R doc options
 #'
