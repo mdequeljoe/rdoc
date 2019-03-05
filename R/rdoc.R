@@ -70,6 +70,7 @@ Rdoc <- R6Class(
   private = list(
     orig_txt = NULL,
     orig_txt_dp = NULL,
+    dbg = NULL,
     rd_txt = NULL,
     rd_sections = NULL,
     rd_fmt = NULL,
@@ -100,6 +101,7 @@ Rdoc <- R6Class(
         private$orig_txt <- as.character(prd)
         private$orig_txt_dp <- as.character(prd, deparse = TRUE)
       }
+      private$dbg <- private$orig_txt
       private$orig_txt <-
         replace_encoding(private$orig_txt, private$orig_txt_dp)
 
