@@ -28,7 +28,6 @@ Rdoc <- R6Class(
     path = NULL,
     pkg = NULL,
     opts = NULL,
-    rd_tmp = NULL,
     initialize = function(topic,
                           by_section,
                           options,
@@ -68,10 +67,8 @@ Rdoc <- R6Class(
     }
   ),
   private = list(
-    orig_txt = NULL,
-    orig_txt_dp = NULL,
-    dbg = NULL,
-    rd_txt = NULL,
+    rdo = NULL, #hold the Rd object
+    rd_txt = NULL, #the output text
     rd_sections = NULL,
     rd_fmt = NULL,
     by_section = TRUE,
@@ -80,37 +77,21 @@ Rdoc <- R6Class(
       if (file.exists(self$topic) &&
           grepl("\\.Rd?|\\.rd?", self$topic)){
         self$path <- normalizePath(self$topic)
+        private$rdo <- parse_Rd(self$path)
       } else {
         self$path <- help_path(self$topic) ### add in params..
         if (!length(self$path))
           stop("topic: ", self$topic, " not found")
         self$pkg <- basename(dirname(dirname(self$path)))
-        self$path <- private$get_help_file(self$path)
+        private$rdo <- private$get_help_file(self$path)
       }
-
-      private$rd_orig_text()
       invisible(self)
     },
-    rd_orig_text = function(){
-      if (inherits(self$path, "Rd")){
-
-        private$orig_txt <- as.character(self$path)
-        private$orig_txt_dp <- as.character(self$path, deparse = TRUE)
-      } else {
-        prd <- parse_Rd(self$path)
-        private$orig_txt <- as.character(prd)
-        private$orig_txt_dp <- as.character(prd, deparse = TRUE)
-      }
-      private$dbg <- private$orig_txt
-      private$orig_txt <-
-        replace_encoding(private$orig_txt, private$orig_txt_dp)
-
-      invisible(self)
-    },
+    #save 'output' rd text for further formatting
     rd_to_text = function(){
       tmp_ <- tempfile(fileext = ".txt")
       Rd2txt(
-        self$rd_tmp,
+        private$rdo,
         out = tmp_,
         options = list(
           underline_titles = TRUE,
@@ -126,7 +107,6 @@ Rdoc <- R6Class(
 
       o <- private$rd_txt
       headers <- which(grepl("^_\b", o))
-      #on error?
       nm <- character(length(headers))
       sections <- lapply(seq_along(headers), function(i) {
         h <- headers[i]
@@ -165,74 +145,8 @@ Rdoc$set("private", "format_code_sections", function(){
 
 Rdoc$set("private", "replace_text_formats", function(){
 
-  #private$check_italic()
-  #private$check_bold()
-  # private$check_code()
-  # private$check_squotes()
-  self$rd_tmp <- tempfile(fileext = ".Rd")
-  cat(private$orig_txt, "\n", sep = "", file = self$rd_tmp)
-
   invisible(self)
 })
-
-Rdoc$set("private", "check_italic", function(){
-
-  m <- which(private$orig_txt == "\\emph")
-  if (length(m))
-    private$orig_txt <-
-      replace_italic(private$orig_txt, m)
-
-  invisible(self)
-})
-
-Rdoc$set("private", "check_bold", function(){
-
-  m <- which(private$orig_txt == "\\bold")
-  if (length(m))
-    private$orig_txt <-
-      replace_bold(private$orig_txt, m)
-
-  invisible(self)
-})
-
-replace_sym <- function(sym, replace_open, replace_close){
-  function(v, match_sym){
-
-    rm_id <- integer(length(v))
-
-    for (i in match_sym){
-
-      v[i] <- replace_open
-      rm_id[i + 1] <- 1L
-      open <- 2L
-      j <- i + 2
-      found_close <- FALSE
-      while(!found_close){
-
-        if (open %% 2 == 0 && v[j] == "}"){
-          v[j] <- replace_close
-          found_close <- TRUE
-        }
-        if (v[j] %in% c("{", "}"))
-          open <- open + 1
-
-        j <- j + 1
-      }
-    }
-    v[-which(rm_id == 1L)]
-  }
-}
-
-replace_italic <- replace_sym("\\emph", "\033[3m", "\033[23m")
-replace_bold <- replace_sym("\\bold", "\033[1m", "\033[22m")
-replace_encoding <- function(k, d){
-  elines <- which(k != d)
-  if (!length(elines))
-    return(k)
-  elines <- elines[grepl("\\\\n|\\\\t|\\\\v|\\\\r|%", k[elines])]
-  k[elines] <- d[elines]
-  k
-}
 
 
 #' R doc options
