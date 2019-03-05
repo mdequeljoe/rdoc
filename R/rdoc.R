@@ -75,11 +75,6 @@ Rdoc <- R6Class(
     rd_fmt = NULL,
     by_section = TRUE,
     get_help_file = getFromNamespace(".getHelpFile", "utils"),
-    topic_ = function(tp){
-      if (is.character(tp))
-        return(tp)
-      deparse(substitute(tp))
-    },
     find_rd_path = function(){
       if (file.exists(self$topic) &&
           grepl("\\.Rd?|\\.rd?", self$topic)){
@@ -97,6 +92,7 @@ Rdoc <- R6Class(
     },
     rd_orig_text = function(){
       if (inherits(self$path, "Rd")){
+
         private$orig_txt <- as.character(self$path)
         private$orig_txt_dp <- as.character(self$path, deparse = TRUE)
       } else {
@@ -125,6 +121,7 @@ Rdoc <- R6Class(
       invisible(self)
     },
     list_sections = function() {
+
       o <- private$rd_txt
       headers <- which(grepl("^_\b", o))
       #on error?
@@ -139,6 +136,7 @@ Rdoc <- R6Class(
       })
       names(sections) <- nm
       private$rd_sections <- sections
+
       invisible(self)
     },
     out_ = function(s) cat(paste(private$append_(s), collapse = "\n")),
