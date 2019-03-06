@@ -74,8 +74,7 @@ Rdoc <- R6Class(
     by_section = TRUE,
     get_help_file = getFromNamespace(".getHelpFile", "utils"),
     find_rd_path = function(){
-      if (file.exists(self$topic) &&
-          grepl("\\.Rd?|\\.rd?", self$topic)){
+      if (file.exists(self$topic)){
         self$path <- normalizePath(self$topic)
         private$rdo <- parse_Rd(self$path)
       } else {
@@ -96,7 +95,7 @@ Rdoc <- R6Class(
         options = list(
           underline_titles = TRUE,
           width = getOption('width') - 3L,
-          code_quote = TRUE,
+          code_quote = TRUE, # maybe remove
           item_bullet = self$opts$item_bullet
         )
       )
