@@ -37,10 +37,15 @@ collapse_ <- function(l){
 }
 
 restore_tags <- function(l, tags){
+  set_ <- function(t) {
+    if (is.null(t) || isTRUE(is.na(t)))
+      return("TEXT")
+    t
+  }
   i <- 1
   l <- lapply(l, function(d){
     if (is.null(attr(d, "Rd_tag")))
-      attr(d, "Rd_tag") <- tags[i]
+      attr(d, "Rd_tag") <- set_(tags[i])
     i <<- i + 1
     d
   })
