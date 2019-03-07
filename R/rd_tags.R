@@ -1,8 +1,8 @@
 #convert rd tags
 
-tag_ <- function(l) {
+tag_ <- function(l, default = character(1)) {
   if (is.null(x <- attr(l, "Rd_tag")))
-    return(character(1))
+    return(default)
   x
 }
 
@@ -13,16 +13,14 @@ to_flat <- function(l) {
 }
 
 save_tags <- function(l){
-
   get_tag <- function(l){
     lapply(l, function(d){
-      if (is.list(d))
+      if (is.list(d) && length(d))
         get_tag(d)
       else
-        attr(d, "Rd_tag")
+        tag_(d, "TEXT")
     })
   }
-
   a <- get_tag(l)
   unlist(a)
 }
@@ -37,15 +35,10 @@ collapse_ <- function(l){
 }
 
 restore_tags <- function(l, tags){
-  set_ <- function(t) {
-    if (is.null(t) || isTRUE(is.na(t)))
-      return("TEXT")
-    t
-  }
   i <- 1
   l <- lapply(l, function(d){
     if (is.null(attr(d, "Rd_tag")))
-      attr(d, "Rd_tag") <- set_(tags[i])
+      attr(d, "Rd_tag") <- tags[i]
     i <<- i + 1
     d
   })
