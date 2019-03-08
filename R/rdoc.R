@@ -81,6 +81,7 @@ Rdoc <- R6Class(
         self$path <- help_path(self$topic) ### add in params..
         if (!length(self$path))
           stop("topic: ", self$topic, " not found")
+        #check for multiple paths
         self$pkg <- basename(dirname(dirname(self$path)))
         private$rdo <- private$get_help_file(self$path)
       }
@@ -143,7 +144,7 @@ Rdoc$set("private", "format_code_sections", function(){
 })
 
 Rdoc$set("private", "replace_text_formats", function(){
-
+  private$rdo <- format_rdo(private$rdo)
   invisible(self)
 })
 
