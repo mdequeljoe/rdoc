@@ -25,12 +25,12 @@ save_tags <- function(l){
   unlist(a)
 }
 
-collapse_ <- function(l){
-  att <- attributes(l)
-  tags <- save_tags(l)
-  l <- unlist(l, recursive = FALSE)
-  l <- restore_tags(l, tags)
-  attributes(l) <- att
+collapse_tag <- function(l, id){
+  for (i in id){
+    att <- attributes(l[[i]])
+    l[[i]] <- unlist(l[[i]], recursive = FALSE)
+    attributes(l[[i]]) <- att
+  }
   l
 }
 
@@ -52,6 +52,7 @@ convert_tag <- function(op, cl){
     tags <- save_tags(l)
     l <- unlist(l, recursive = FALSE)
     l <- restore_tags(l, tags)
+    attr(l, "Rd_tag") <- "TEXT"
     attr(l, "flat") <- TRUE
     l
   }
@@ -62,21 +63,24 @@ fmt_bold <- convert_tag("\033[1m", "\033[22m")
 
 format_rdo <- function(l) {
 
-  as_flat <- FALSE
+  id <- numeric()
+  i <- 1L
   att <- attributes(l)
   o <- lapply(l, function(d) {
     if (is.list(d)) {
       d <- format_rdo(d)
 
-      if (to_flat(d))
-        as_flat <<- TRUE
+      if (to_flat(d)){
+        id <<- c(id, i)
+      }
     }
+    i <<- i + 1
     d
   })
   attributes(o) <- att
 
-  if (as_flat)
-    o <- collapse_(o)
+  if (length(id))
+    o <- collapse_tag(o, id)
 
   if (tag_(o) == "\\emph")
     return(fmt_italics(o))
