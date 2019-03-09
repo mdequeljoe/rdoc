@@ -143,8 +143,12 @@ Rdoc$set("private", "format_code_sections", function(){
     if (is.null(s <- private$rd_sections[[d]]))
       return(NULL)
 
-    s[2:length(s)] <-
-      highlight(s[2:length(s)], style = self$opts$code_style)
+    #todo: partial highlighting - avoid text chunks (## ... ##)
+    s[2:length(s)] <- tryCatch(
+      highlight(s[2:length(s)], style = self$opts$code_style),
+      error = function(e) s[2:length(s)],
+      warning = function(w) s[2:length(s)]
+    )
 
     private$rd_sections[[d]] <<- s
   })
