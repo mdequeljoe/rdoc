@@ -27,6 +27,7 @@ Rdoc <- R6Class(
     topic = NULL,
     path = NULL,
     pkg = NULL,
+    lib = NULL,
     opts = NULL,
     initialize = function(topic,
                           by_section = FALSE,
@@ -36,6 +37,8 @@ Rdoc <- R6Class(
 
       self$topic <- topic
       self$opts <- options
+      self$pkg <- package
+      self$lib <- lib.loc
       private$by_section <- by_section
       private$find_rd_path()
       private$replace_text_formats()
@@ -73,16 +76,22 @@ Rdoc <- R6Class(
     rd_fmt = NULL,
     by_section = TRUE,
     get_help_file = getFromNamespace(".getHelpFile", "utils"),
-    find_rd_path = function(){
+    find_rd_path = function(package, lib.loc){
       if (file.exists(self$topic)){
         self$path <- normalizePath(self$topic)
         private$rdo <- parse_Rd(self$path)
       } else {
-        self$path <- help_path(self$topic) ### add in params..
+
+        self$path <- help_path(self$topic, self$pkg, self$lib)
         if (!length(self$path))
           stop("topic: ", self$topic, " not found")
-        #check for multiple paths
-        self$pkg <- basename(dirname(dirname(self$path)))
+
+        if (length(self$path) > 1)
+          private$select_path()
+
+        if (is.null(self$pkg))
+          self$pkg <- get_pkg(self$path)
+
         private$rdo <- private$get_help_file(self$path)
       }
       invisible(self)
@@ -148,6 +157,27 @@ Rdoc$set("private", "replace_text_formats", function(){
   invisible(self)
 })
 
+Rdoc$set("private", "select_path", function() {
+  if (interactive()) {
+    p <- paste(1:length(self$path), get_pkg(self$path), sep = ": ")
+    msg <-
+      sprintf(
+        "multiple paths found for topic: %s\n%s\n%s\n",
+        self$topic,
+        paste(p, collapse = "\n"),
+        "enter number to select"
+      )
+    cat(msg)
+    selection <- readline("")
+    self$path <- self$path[as.numeric(substr(selection, 1, 1))]
+  } else
+    self$path <- self$path[1L]
+
+  invisible(self)
+})
+
+get_pkg <- function(path)
+  basename(dirname(dirname(path)))
 
 #' R doc options
 #'
