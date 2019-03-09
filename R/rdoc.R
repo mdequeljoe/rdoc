@@ -163,17 +163,21 @@ Rdoc$set("private", "replace_text_formats", function(){
 
 Rdoc$set("private", "select_path", function() {
   if (interactive()) {
-    p <- paste(1:length(self$path), get_pkg(self$path), sep = ": ")
+    id <- 1:length(self$path)
+    p <- paste(id, get_pkg(self$path), sep = ": ")
     msg <-
       sprintf(
         "multiple paths found for topic: %s\n%s\n%s\n",
         self$topic,
         paste(p, collapse = "\n"),
-        "enter number to select"
+        "enter number to select (or any key for first topic)"
       )
     cat(msg)
     selection <- readline("")
-    self$path <- self$path[as.numeric(substr(selection, 1, 1))]
+    s <- as.numeric(substr(selection, 1, 1))
+    if (!s %in% id)
+      s <- 1L
+    self$path <- self$path[s]
   } else
     self$path <- self$path[1L]
 
