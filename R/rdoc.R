@@ -77,7 +77,7 @@ Rdoc <- R6Class(
     by_section = TRUE,
     get_help_file = getFromNamespace(".getHelpFile", "utils"),
     find_rd_path = function(package, lib.loc){
-      if (file.exists(self$topic)){
+      if (file.exists(self$topic) && is_rd_file(self$topic)){
         self$path <- normalizePath(self$topic)
         private$rdo <- parse_Rd(self$path)
       } else {
@@ -182,6 +182,9 @@ Rdoc$set("private", "select_path", function() {
 
 get_pkg <- function(path)
   basename(dirname(dirname(path)))
+
+is_rd_file <- function(path)
+  grepl(".+\\.[R|r]d$", path)
 
 #' R doc options
 #'
