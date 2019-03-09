@@ -29,10 +29,10 @@ Rdoc <- R6Class(
     pkg = NULL,
     opts = NULL,
     initialize = function(topic,
-                          by_section,
-                          options,
-                          package,
-                          lib.loc) {
+                          by_section = FALSE,
+                          options = rdoc_options(),
+                          package = NULL,
+                          lib.loc = NULL) {
 
       self$topic <- topic
       self$opts <- options
