@@ -6,54 +6,33 @@ tag_ <- function(l, default = character(1)) {
   x
 }
 
-to_flat <- function(l) {
-  if (is.null(x <- attr(l, "flat")))
-    return(FALSE)
-  x
-}
-
-save_tags <- function(l){
-  get_tag <- function(l){
-    lapply(l, function(d){
-      if (is.list(d) && length(d))
-        get_tag(d)
-      else
-        tag_(d, "TEXT")
-    })
-  }
-  a <- get_tag(l)
-  unlist(a)
-}
-
-collapse_tag <- function(l, id){
-  for (i in id){
-    att <- attributes(l[[i]])
-    l[[i]] <- unlist(l[[i]], recursive = FALSE)
-    attributes(l[[i]]) <- att
-  }
-  l
-}
-
-restore_tags <- function(l, tags){
-  i <- 1
-  l <- lapply(l, function(d){
-    if (is.null(attr(d, "Rd_tag")))
-      attr(d, "Rd_tag") <- tags[i]
-    i <<- i + 1
-    d
+apply_fmt <- function(l, op, cl){
+  lapply(l, function(d){
+    if (is.list(d)){
+      at <- attributes(d)
+      x <- apply_fmt(d, op, cl)
+      attributes(x) <- at
+    }
+    else{
+      at <- attributes(d)
+      x <- paste0(op, d, cl)
+      attributes(x) <- at
+    }
+    x
   })
-  l
 }
 
 convert_tag <- function(op, cl){
   function(l) {
-    l[[1]][1] <- paste0(op, l[[1]][1])
-    l[[length(l)]][1] <- paste0(l[[length(l)]][1], cl)
-    tags <- save_tags(l)
+    l <- apply_fmt(l, op, cl)
+
+    att <- attr(l[[1]], "Rd_tag")
     l <- unlist(l, recursive = FALSE)
-    l <- restore_tags(l, tags)
-    attr(l, "Rd_tag") <- "TEXT"
-    attr(l, "flat") <- TRUE
+
+    if (is.null(att))
+      attr(l, "Rd_tag") <- "TEXT"
+    else
+      attr(l, "Rd_tag") <- att
     l
   }
 }
@@ -63,24 +42,20 @@ fmt_bold <- convert_tag("\033[1m", "\033[22m")
 
 format_rdo <- function(l) {
 
-  id <- numeric()
-  i <- 1L
   att <- attributes(l)
   o <- lapply(l, function(d) {
-    if (is.list(d)) {
+    if (is.list(d))
       d <- format_rdo(d)
-
-      if (to_flat(d)){
-        id <<- c(id, i)
-      }
-    }
-    i <<- i + 1
     d
   })
   attributes(o) <- att
 
-  if (length(id))
-    o <- collapse_tag(o, id)
+  # empty list
+  if (tag_(o) == "\\R"){
+    x <- "<R>"
+    attr(x, "Rd_tag") <- "TEXT"
+    return(x)
+  }
 
   if (tag_(o) == "\\emph")
     return(fmt_italics(o))
