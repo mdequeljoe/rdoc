@@ -1,4 +1,4 @@
-#convert rd tags
+#convert rd tags to their corresponding formatting
 
 tag_ <- function(l, default = character(1)) {
   if (is.null(x <- attr(l, "Rd_tag")))
@@ -25,15 +25,9 @@ apply_fmt <- function(l, op, cl){
 convert_tag <- function(op, cl){
   function(l) {
     l <- apply_fmt(l, op, cl)
-
-    att <- attr(l[[1]], "Rd_tag")
-    l <- unlist(l, recursive = FALSE)
-
-    if (is.null(att))
-      attr(l, "Rd_tag") <- "TEXT"
-    else
-      attr(l, "Rd_tag") <- att
-    l
+    if (length(l) > 1)
+      return(l)
+    l[[1]]
   }
 }
 
@@ -50,7 +44,7 @@ format_rdo <- function(l) {
   })
   attributes(o) <- att
 
-  # empty list
+  # R logo symbol
   if (tag_(o) == "\\R"){
     x <- "<R>"
     attr(x, "Rd_tag") <- "TEXT"
