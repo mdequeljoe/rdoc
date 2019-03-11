@@ -22,11 +22,24 @@ apply_fmt <- function(l, op, cl){
   })
 }
 
+is_all_text <- function(l){
+  rd_tag <- vapply(l, attr, character(1), which = "Rd_tag")
+  all(rd_tag == "TEXT")
+}
+
 convert_tag <- function(op, cl){
   function(l) {
     l <- apply_fmt(l, op, cl)
+
+    if (is_all_text(l)){
+      l <- Reduce(paste, l)
+      attr(l, "Rd_tag") <- "TEXT"
+      return(l)
+    }
+
     if (length(l) > 1)
       return(l)
+
     l[[1]]
   }
 }
