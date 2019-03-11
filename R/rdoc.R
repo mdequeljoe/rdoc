@@ -28,8 +28,12 @@ rdoc <- function(topic,
 rd <- rdoc
 
 #' @export
-rd_example <- function(topic, options = rdoc_options()) {
-  doc <- Rdoc$new(topic, by_section = FALSE, options, package, lib.loc)
+rd_example <- function(topic,
+                       by_section = TRUE,
+                       options = rdoc_options(),
+                       package = NULL,
+                       lib.loc = NULL) {
+  doc <- Rdoc$new(topic, by_section, options, package, lib.loc)
   doc$show("examples")
 }
 
@@ -66,7 +70,10 @@ Rdoc <- R6Class(
 
       s <- private$rd_sections
 
-      if (!is.null(which) || !private$by_section || !interactive())
+      if (!is.null(which))
+        s <- s[which[which %in% names(s)]]
+
+      if (!private$by_section || !interactive())
         return(private$out_(s))
 
       n <- length(s)
