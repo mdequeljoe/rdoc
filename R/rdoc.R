@@ -114,9 +114,9 @@ Rdoc <- R6Class(
       invisible(self)
     },
     list_sections = function() {
-
+      # maybe get headers from rdo not txt?
       o <- private$rd_txt
-      headers <- which(grepl("^_\b", o))
+      headers <- which(grepl("^([[:punct:]]?)_\\b", o))
       nm <- character(length(headers))
       sections <- lapply(seq_along(headers), function(i) {
         h <- headers[i]
