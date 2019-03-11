@@ -6,10 +6,6 @@ help_path <-
             lib.loc = NULL,
             try.all.packages = getOption("help.try.all.packages")){
 
-    if (!missing(package))
-      if (is.name(y <- substitute(package)))
-        package <- as.character(y)
-
       ischar <- tryCatch(
         is.character(topic) && length(topic) ==
           1L,
