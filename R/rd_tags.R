@@ -22,30 +22,17 @@ apply_fmt <- function(l, op, cl){
   })
 }
 
-is_all_text <- function(l){
-  rd_tag <- vapply(l, attr, character(1), which = "Rd_tag")
-  all(rd_tag == "TEXT")
-}
-
 convert_tag <- function(op, cl){
   function(l) {
     l <- apply_fmt(l, op, cl)
-
-    if (is_all_text(l)){
-      l <- Reduce(paste, l)
-      attr(l, "Rd_tag") <- "TEXT"
-      return(l)
-    }
-
-    if (length(l) > 1)
-      return(l)
-
-    l[[1]]
+    attr(l, "Rd_tag") <- "\\special"
+    l
   }
 }
 
 fmt_italics <- convert_tag("\033[3m", "\033[23m")
 fmt_bold <- convert_tag("\033[1m", "\033[22m")
+fmt_squotes <- convert_tag("'", "'")
 
 format_rdo <- function(l) {
 
@@ -63,6 +50,9 @@ format_rdo <- function(l) {
     attr(x, "Rd_tag") <- "TEXT"
     return(x)
   }
+#
+#   if (tag_(o) == "\\sQuote")
+#     return(fmt_squotes(o))
 
   if (tag_(o) == "\\emph")
     return(fmt_italics(o))
