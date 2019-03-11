@@ -11,9 +11,3 @@ test_that("help path returns a string", {
 
 })
 
-test_that("help path accepts nse", {
-  p <- help_path(min)
-  expect_true(is.character(p))
-  expect_equal(length(p), 1L)
-})
-

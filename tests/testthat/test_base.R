@@ -1,3 +1,4 @@
+context("base R docs")
 get_help_file <- getFromNamespace(".getHelpFile", "utils")
 get_rdo <- function(topic, pkg = NULL){
   get_help_file(
@@ -44,7 +45,7 @@ test_pkg <- function(pkg) {
     #expect_true(check_len)
     if (!check_len) {
       cat(fn,
-          "doesnt meet length check:\n original rd length = " ,
+          "\ndoesnt meet length check:\n original rd length = " ,
           length(orig_rdo),
           "\nconverted rd length = ",
           length(out),
