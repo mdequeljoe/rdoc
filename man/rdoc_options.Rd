@@ -6,7 +6,8 @@
 \usage{
 rdoc_options(pkg_header = cli::rule, title = crayon::bold,
   section_titles = crayon::underline, arg_params = crayon::underline,
-  code = prettycode::highlight, item_bullet = cli::symbol$bullet)
+  code_style = prettycode::default_style(),
+  item_bullet = cli::symbol$bullet)
 }
 \description{
 Set output styles

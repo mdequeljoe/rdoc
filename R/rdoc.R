@@ -1,10 +1,20 @@
-#' Pretty print R docs
+#' R docs
 #'
-#' Refer to R docs in the console
+#' Refer to colourised R docs in the console
+#' @aliases rd
+#' @param topic character(1), help topic
+#' @param by_section logical(1), should docs be shown section by section or all
+#'   at once? Defaults to TRUE.
+#' @param package character(1), package of help topic. Defaults to NULL.
+#' @param lib.loc character(1), library location of package. Defaults to null.
 #'
+#' @examples \dontrun{
 #'
+#' rd("min", by_section = FALSE)
+#'
+#' }
 #' @export
-rd <- function(topic,
+rdoc <- function(topic,
                by_section = TRUE,
                options = rdoc_options(),
                package = NULL,
@@ -12,6 +22,10 @@ rd <- function(topic,
   doc <- Rdoc$new(topic, by_section, options, package, lib.loc)
   doc$show()
 }
+
+
+#'@export
+rd <- rdoc
 
 #' @export
 rd_example <- function(topic, options = rdoc_options()) {

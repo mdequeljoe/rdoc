@@ -2,9 +2,11 @@
 
 export(rd)
 export(rd_example)
+export(rdoc)
 export(rdoc_options)
 import(cli)
 import(crayon)
 import(prettycode)
 importFrom(R6,R6Class)
 importFrom(tools,Rd2txt)
+importFrom(tools,parse_Rd)
