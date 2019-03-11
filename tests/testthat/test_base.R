@@ -18,26 +18,40 @@ rd_check <- function(topic){
   )
 }
 
-test_pkg <- function(pkg){
+test_pkg <- function(pkg) {
   pkg_exports <- ls(sprintf("package:%s", pkg))
 
-  o <- lapply(pkg_exports, function(fn){
-
-    print(fn)
+  o <- lapply(pkg_exports, function(fn) {
     out <- tryCatch(
-      capture.output(rd(fn, by_section = FALSE, package = pkg)),
-      error = function(e) e,
-      warning = function(w) w
+      capture.output(rd(
+        fn, by_section = FALSE, package = pkg
+      )),
+      error = function(e)
+        e,
+      warning = function(w)
+        w
     )
     passed <- !inherits(out, "condition")
     expect_true(passed)
 
-    if (!passed)
+    if (!passed) {
+      print(fn)
       return(NULL)
-    orig_rdo <- check(fn, pkg)
-    expect_true(length(out) >= length(orig_rdo))
+    }
 
+    orig_rdo <- check(fn, pkg)
+    check_len <- length(out) >= length(orig_rdo)
+    #expect_true(check_len)
+    if (!check_len) {
+      cat(fn,
+          "doesnt meet length check:\n original rd length = " ,
+          length(orig_rdo),
+          "\nconverted rd length = ",
+          length(out),
+          "\n\n")
+    }
   })
+
   invisible(NULL)
 }
 
