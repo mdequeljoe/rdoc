@@ -83,6 +83,7 @@ Rdoc <- R6Class(
       } else {
 
         self$path <- help_path(self$topic, self$pkg, self$lib)
+
         if (!length(self$path))
           stop("topic: ", self$topic, " not found")
 
@@ -130,7 +131,8 @@ Rdoc <- R6Class(
 
       invisible(self)
     },
-    out_ = function(s) cat(paste(private$append_(s), collapse = "\n")),
+
+    out_ = function(s) cat(private$append_(s), sep = "\n"),
     append_ = function(l) Reduce(append, l)
   )
 )
