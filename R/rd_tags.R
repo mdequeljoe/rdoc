@@ -7,7 +7,6 @@ tag_ <- function(l, default = character(1)) {
 }
 
 get_subtags <- function(l){
-
   subtag_ <- function(l){
     lapply(l, function(d){
       if (is.list(d))
@@ -22,16 +21,12 @@ get_subtags <- function(l){
 
 apply_fmt <- function(l, op, cl){
   lapply(l, function(d){
-    if (is.list(d)){
-      at <- attributes(d)
+    at <- attributes(d)
+    if (is.list(d))
       x <- apply_fmt(d, op, cl)
-      attributes(x) <- at
-    }
-    else{
-      at <- attributes(d)
+    else
       x <- paste0(op, d, cl)
-      attributes(x) <- at
-    }
+    attributes(x) <- at
     x
   })
 }
