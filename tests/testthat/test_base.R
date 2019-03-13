@@ -19,8 +19,12 @@ rd_check <- function(topic){
   )
 }
 
-test_pkg <- function(pkg) {
+test_pkg <- function(pkg, partial = FALSE, n = 100L) {
+
   pkg_exports <- ls(sprintf("package:%s", pkg))
+
+  if (partial)
+    pkg_exports <- pkg_exports[sample(seq_along(pkg_exports), n)]
 
   o <- lapply(pkg_exports, function(fn) {
     out <- tryCatch(
@@ -44,10 +48,10 @@ test_pkg <- function(pkg) {
     check_len <- length(out) >= length(orig_rdo)
     #expect_true(check_len)
     if (!check_len) {
-      cat(fn,
-          "\ndoesnt meet length check:\n original rd length = " ,
+      cat("\n", fn,
+          "doesnt meet length check:\n original rd length = " ,
           length(orig_rdo),
-          "\nconverted rd length = ",
+          "\n converted rd length = ",
           length(out),
           "\n\n")
     }
@@ -57,7 +61,7 @@ test_pkg <- function(pkg) {
 }
 
 test_that("base package docs output without error or warning", {
-  test_pkg("utils")
-  test_pkg("base")
-  test_pkg("stats")
+  test_pkg("utils", TRUE, 50)
+  test_pkg("base", TRUE, 50)
+  test_pkg("stats", TRUE, 50)
 })
