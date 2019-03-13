@@ -9,7 +9,7 @@ tag_ <- function(l, default = character(1)) {
 get_subtags <- function(l){
   subtag_ <- function(l){
     lapply(l, function(d){
-      if (is.list(d))
+      if (is.list(d) && length(d))
         subtag_(d)
       else
         tag_(d)
@@ -38,7 +38,6 @@ convert_tag <- function(op, cl){
     l
   }
 }
-
 
 fmt_italics <- convert_tag("\033[3m", "\033[23m")
 fmt_bold <- convert_tag("\033[1m", "\033[22m")
