@@ -31,6 +31,21 @@ apply_fmt <- function(l, op, cl){
   })
 }
 
+# convert style tags
+# replace with \\special tag to keep existing list as is
+# since from Rd2txt we want to use 'writeContent' with no markup :
+#
+# "\\special" = ,
+# "\\var" = writeContent(block, tag),
+#
+#
+# "\\bold"=,
+# "\\strong"= {
+#   put("*")
+#   writeContent(block, tag)
+#   put("*")
+# },
+
 convert_tag <- function(op, cl){
   function(l) {
     l <- apply_fmt(l, op, cl)
