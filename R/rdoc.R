@@ -126,7 +126,7 @@ Rdoc <- R6Class(
         out = tmp_,
         options = list(
           underline_titles = TRUE,
-          width = getOption('width') - 3L,
+          width = getOption('width'),
           code_quote = TRUE, # maybe remove
           item_bullet = self$opts$item_bullet
         )

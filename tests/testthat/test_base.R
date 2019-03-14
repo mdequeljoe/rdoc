@@ -9,7 +9,7 @@ check <- function(topic, pkg = NULL){
   capture.output(
     tools::Rd2txt(
       get_rdo(topic, pkg),
-      options = list(width = getOption('width') - 3L)
+      options = list(width = getOption('width'))
     )
   )
 }
