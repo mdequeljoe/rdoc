@@ -5,7 +5,7 @@ rd_ <- function(which = NULL){
            package = NULL,
            lib.loc = NULL) {
     topic <- as.character(substitute(topic))
-    if (!is.null(package))
+    if (!missing(package))
       package <- as.character(substitute(package))
     doc <- Rdoc$new(topic, by_section, options, package, lib.loc)
     doc$show(which)
