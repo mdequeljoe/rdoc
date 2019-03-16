@@ -22,6 +22,7 @@ Rdoc <- R6Class(
       private$find_rd_path()
       private$replace_text_formats()
       private$rd_to_text()
+      private$reflow()
       invisible(self)
     },
     show = function(which = NULL){
@@ -113,6 +114,10 @@ Rdoc <- R6Class(
 
       invisible(self)
     },
+    reflow = function(){
+      private$rd_txt <- reflow_lines(private$rd_txt, getOption('width'))
+      invisible(self)
+    },
 
     out_ = function(s) cat(private$append_(s), sep = "\n"),
     append_ = function(l) Reduce(append, l)
@@ -173,3 +178,39 @@ get_pkg <- function(path)
 
 is_rd_file <- function(path)
   grepl(".+\\.[R|r]d$", path)
+
+reflow_lines <- function(x, w){
+
+  i <- 1
+  while (i < length(x)) {
+
+    t <- !has_style(x[i]) ||
+      !nzchar(x[i + 1]) ||
+      !grepl("\\S", x[i + 1]) ||
+      grepl("^([[:punct:]]?)_\\b", x[i + 1])
+
+    if (t) {
+      i <- i + 1
+      next
+    }
+
+    olen <- nchar(strip_style(x[i]))
+    nlen <- if (has_style(x[i + 1]))
+      nchar(strip_style(x[i + 1]))
+    else
+      nchar(x[i + 1])
+
+    open_space <- w - olen
+
+    if (nlen <= open_space) {
+      x[i] <- paste(x[i], rm_indent(x[i + 1]))
+      x <- x[-(i + 1)]
+    }
+    i <- i + 1
+  }
+  x
+}
+
+rm_indent <- function(x) sub("^\\s+(\\S+)", "\\1", x)
+line_spaces <- function(x)
+  gregexpr("\\s", x)[[1L]]
