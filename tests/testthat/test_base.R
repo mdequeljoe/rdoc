@@ -19,6 +19,20 @@ rd_check <- function(topic){
   )
 }
 
+strip_lines <- function(x){
+  gsub("\\s|[[:punct:]]", "", x)
+}
+
+compare_rd <- function(o, k){
+  o <- strip_lines(o)
+  o <- paste(o, collapse = "")
+  k <- crayon::strip_style(k)
+  k <- strip_lines(k)
+  k <- paste(k, collapse = "")
+  k == o
+}
+
+
 test_pkg <- function(pkg, partial = FALSE, n = 100L) {
 
   pkg_exports <- ls(sprintf("package:%s", pkg))
@@ -44,24 +58,16 @@ test_pkg <- function(pkg, partial = FALSE, n = 100L) {
       return(NULL)
     }
 
-    orig_rdo <- check(fn, pkg)
-    check_len <- length(out) >= length(orig_rdo)
-    #expect_true(check_len)
-    if (!check_len) {
-      cat("\n", fn,
-          "doesnt meet length check:\n original rd length = " ,
-          length(orig_rdo),
-          "\n converted rd length = ",
-          length(out),
-          "\n\n")
-    }
+    orig <- check(fn, pkg)
+    expect_true(compare_rd(orig, out))
+
   })
 
   invisible(NULL)
 }
 
 test_that("base package docs output without error or warning", {
-  test_pkg("utils", TRUE, 50)
-  test_pkg("base", TRUE, 50)
-  test_pkg("stats", TRUE, 50)
+  test_pkg("utils", TRUE, 30)
+  test_pkg("base", TRUE, 30)
+  test_pkg("stats", TRUE, 30)
 })
