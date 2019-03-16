@@ -28,10 +28,7 @@ rd_ <- function(which = NULL){
 #'
 #' }
 #' @export
-rdoc <- rd_()
-
-#'@export
-rd <- rdoc
+rd <- rd_()
 
 #' @export
 rd_details <- rd_("details")
