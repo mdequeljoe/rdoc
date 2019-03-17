@@ -27,6 +27,7 @@ rd_ <- function(which = NULL){
 #' @param topic \code{character(1)}, help topic
 #' @param by_section \code{logical(1)}, should docs be shown section by section or all
 #'   at once? Defaults to TRUE.
+#' @param options named list. Defaults to \code{rdoc_options()}
 #' @param package \code{character(1)}, package of help topic. Defaults to NULL.
 #' @param lib.loc \code{character(1)}, library location of package. Defaults to null.
 #'
@@ -44,7 +45,8 @@ rd <- rd_()
 #' @export
 rd_details <- rd_("details")
 
-#' @inheritParams rd
+#' @family rd access
+#' @inherit rd
 #' @aliases rd_examples
 #' @export
 rd_example <- rd_("examples")

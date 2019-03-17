@@ -13,6 +13,8 @@ rd(topic, by_section = TRUE, options = rdoc_options(),
 \item{by_section}{\code{logical(1)}, should docs be shown section by section or all
 at once? Defaults to TRUE.}
 
+\item{options}{named list. Defaults to \code{rdoc_options()}}
+
 \item{package}{\code{character(1)}, package of help topic. Defaults to NULL.}
 
 \item{lib.loc}{\code{character(1)}, library location of package. Defaults to null.}
@@ -29,6 +31,7 @@ rd_example("min")
 }
 }
 \seealso{
-Other rd access: \code{\link{rd_details}}
+Other rd access: \code{\link{rd_details}},
+  \code{\link{rd_example}}
 }
 \concept{rd access}
