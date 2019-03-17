@@ -33,6 +33,7 @@ rd_ <- function(which = NULL) {
 #' @param topic \code{character(1)}, help topic
 #' @param by_section \code{logical(1)}, should docs be shown section by section or all
 #'   at once? Defaults to TRUE.
+#' @param include_header \code{logical(1)}, should a package header be shown with documentation? Defaults to TRUE.
 #' @param options named list. Defaults to \code{rdoc_options()}
 #' @param package \code{character(1)}, package of help topic. Defaults to NULL.
 #' @param lib.loc \code{character(1)}, library location of package. Defaults to null.
@@ -40,7 +41,9 @@ rd_ <- function(which = NULL) {
 #' @examples \dontrun{
 #'
 #' rd("rd", by_section = FALSE)
+#' rd(grepl)
 #' rd_example("min")
+#' rd_details(substr)
 #'
 #' }
 #' @export
@@ -50,6 +53,16 @@ rd <- rd_()
 #' @inherit rd
 #' @export
 rd_details <- rd_("details")
+
+#' @family rd access
+#' @inherit rd
+#' @export
+rd_arguments <- rd_("arguments")
+
+#' @family rd access
+#' @inherit rd
+#' @export
+rd_usage <- rd_("usage")
 
 #' @family rd access
 #' @inherit rd
