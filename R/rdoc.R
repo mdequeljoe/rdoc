@@ -9,9 +9,9 @@ rd_ <- function(which = NULL){
       topic <- as.character(substitute(topic))
 
     if (!missing(package)){
-      pkg <- as.character(substitute(p))
-      if (pkg %in% loadedNamespaces())
-        p <- pkg
+      p <- as.character(substitute(package))
+      if (p %in% loadedNamespaces())
+        package <- p
     }
 
     doc <- Rdoc$new(topic, by_section, options, package, lib.loc)
