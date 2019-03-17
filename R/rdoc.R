@@ -4,9 +4,16 @@ rd_ <- function(which = NULL){
            options = rdoc_options(),
            package = NULL,
            lib.loc = NULL) {
-    topic <- as.character(substitute(topic))
-    if (!missing(package))
-      package <- as.character(substitute(package))
+
+    if (is.function(topic))
+      topic <- as.character(substitute(topic))
+
+    if (!missing(package)){
+      pkg <- as.character(substitute(p))
+      if (pkg %in% loadedNamespaces())
+        p <- pkg
+    }
+
     doc <- Rdoc$new(topic, by_section, options, package, lib.loc)
     doc$show(which)
   }
