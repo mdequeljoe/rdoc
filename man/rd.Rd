@@ -2,9 +2,26 @@
 % Please edit documentation in R/rdoc.R
 \name{rd}
 \alias{rd}
+\alias{rd_details}
+\alias{rd_arguments}
+\alias{rd_usage}
+\alias{rd_example}
+\alias{rd_examples}
 \title{R docs}
 \usage{
 rd(topic, by_section = TRUE, include_header = TRUE,
+  options = rdoc_options(), package = NULL, lib.loc = NULL)
+
+rd_details(topic, by_section = TRUE, include_header = TRUE,
+  options = rdoc_options(), package = NULL, lib.loc = NULL)
+
+rd_arguments(topic, by_section = TRUE, include_header = TRUE,
+  options = rdoc_options(), package = NULL, lib.loc = NULL)
+
+rd_usage(topic, by_section = TRUE, include_header = TRUE,
+  options = rdoc_options(), package = NULL, lib.loc = NULL)
+
+rd_example(topic, by_section = TRUE, include_header = TRUE,
   options = rdoc_options(), package = NULL, lib.loc = NULL)
 }
 \arguments{
@@ -22,7 +39,7 @@ at once? Defaults to TRUE.}
 \item{lib.loc}{\code{character(1)}, library location of package. Defaults to null.}
 }
 \description{
-Refer to colourised R docs in the console
+Refer to colourised \R docs in the console
 }
 \examples{
 \dontrun{
@@ -30,13 +47,8 @@ Refer to colourised R docs in the console
 rd("rd", by_section = FALSE)
 rd(grepl)
 rd_example("min")
-rd_details(substr)
+rd_usage(substr)
 
 }
-}
-\seealso{
-Other rd access: \code{\link{rd_arguments}},
-  \code{\link{rd_details}}, \code{\link{rd_example}},
-  \code{\link{rd_usage}}
 }
 \concept{rd access}

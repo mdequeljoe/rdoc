@@ -27,7 +27,7 @@ rd_ <- function(which = NULL) {
 
 #' R docs
 #'
-#' Refer to colourised R docs in the console
+#' Refer to colourised \R docs in the console
 #' @family rd access
 #' @aliases rd
 #' @param topic \code{character(1)}, help topic
@@ -43,29 +43,26 @@ rd_ <- function(which = NULL) {
 #' rd("rd", by_section = FALSE)
 #' rd(grepl)
 #' rd_example("min")
-#' rd_details(substr)
+#' rd_usage(substr)
 #'
 #' }
 #' @export
 rd <- rd_()
 
-#' @family rd access
-#' @inherit rd
+
+#' @rdname rd
 #' @export
 rd_details <- rd_("details")
 
-#' @family rd access
-#' @inherit rd
+#' @rdname rd
 #' @export
 rd_arguments <- rd_("arguments")
 
-#' @family rd access
-#' @inherit rd
+#' @rdname rd
 #' @export
 rd_usage <- rd_("usage")
 
-#' @family rd access
-#' @inherit rd
+#' @rdname rd
 #' @aliases rd_examples
 #' @export
 rd_example <- rd_("examples")
