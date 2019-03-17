@@ -10,6 +10,7 @@ Rdoc <- R6Class(
     opts = NULL,
     initialize = function(topic,
                           by_section = FALSE,
+                          include_header = TRUE,
                           options = rdoc_options(),
                           package = NULL,
                           lib.loc = NULL) {
@@ -19,6 +20,7 @@ Rdoc <- R6Class(
       self$pkg <- package
       self$lib <- lib.loc
       private$by_section <- by_section
+      private$include_header <- include_header
       private$find_rd_path()
       private$replace_text_formats()
       private$rd_to_text()
@@ -29,6 +31,7 @@ Rdoc <- R6Class(
 
       private$list_sections()
       private$format_code_sections()
+      private$show_pkg_header()
 
       s <- private$rd_sections
 
@@ -58,6 +61,7 @@ Rdoc <- R6Class(
     rd_sections = NULL,
     rd_fmt = NULL,
     by_section = TRUE,
+    include_header = TRUE,
     get_help_file = getFromNamespace(".getHelpFile", "utils"),
     find_rd_path = function(package, lib.loc){
       if (file.exists(self$topic) && is_rd_file(self$topic)){
@@ -172,6 +176,20 @@ Rdoc$set("private", "select_path", function() {
 
   invisible(self)
 })
+
+Rdoc$set("private", "show_pkg_header", function() {
+  if (!private$include_header)
+    return(invisible(self))
+  left_ <- if (is.null(self$pkg))
+    self$topic
+  else
+    sprintf("%s {%s}", self$topic, self$pkg)
+  cat_rule(left = left_, right = R_logo("Rdoc"))
+  cat("\n")
+  invisible(self)
+})
+
+
 
 get_pkg <- function(path)
   basename(dirname(dirname(path)))

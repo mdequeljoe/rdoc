@@ -12,7 +12,12 @@ check_original <- function(topic, pkg = NULL) {
 }
 
 check_rd <- function(topic, pkg = NULL) {
-  capture.output(rdoc::rd(topic, by_section = FALSE, package = pkg))
+  capture.output(rdoc::rd(
+    topic,
+    by_section = FALSE,
+    include_header = FALSE,
+    package = pkg
+  ))
 }
 
 strip_lines <- function(x) {

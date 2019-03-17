@@ -1,20 +1,26 @@
-rd_ <- function(which = NULL){
+rd_ <- function(which = NULL) {
   function(topic,
            by_section = TRUE,
+           include_header = TRUE,
            options = rdoc_options(),
            package = NULL,
            lib.loc = NULL) {
-
     if (is.function(topic))
       topic <- as.character(substitute(topic))
 
-    if (!missing(package)){
+    if (!missing(package)) {
       p <- as.character(substitute(package))
       if (p %in% loadedNamespaces())
         package <- p
     }
 
-    doc <- Rdoc$new(topic, by_section, options, package, lib.loc)
+    doc <-
+      Rdoc$new(topic,
+               by_section,
+               include_header,
+               options,
+               package,
+               lib.loc)
     doc$show(which)
   }
 }
