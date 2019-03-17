@@ -3,6 +3,7 @@
 export(rd)
 export(rd_details)
 export(rd_example)
+export(rd_examples)
 export(rdoc_options)
 import(cli)
 import(crayon)

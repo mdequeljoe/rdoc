@@ -9,6 +9,19 @@ rdoc_options(pkg_header = cli::rule, title = crayon::bold,
   code_style = prettycode::default_style(),
   item_bullet = cli::symbol$bullet)
 }
+\arguments{
+\item{pkg_header}{package header information. Defaults to \code{cli::rule}}
+
+\item{title}{topic title. Defaults to \code{crayon::bold}}
+
+\item{section_titles}{section titles Defaults to \code{crayon::underline}}
+
+\item{arg_params}{argument paramets. Defaults to \code{crayon::underline}}
+
+\item{code_style}{code sections and inline code. Defaults to \code{prettycode::default_style()}}
+
+\item{item_bullet}{item bullet points. Defaults to \code{cli::symbol$bullet}}
+}
 \description{
-Set output styles
+Set output formatting styles
 }
