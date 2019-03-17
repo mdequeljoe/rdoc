@@ -46,7 +46,7 @@ test_pkg <- function(pkg, partial = FALSE, n = 100L) {
     expect_true(passed)
 
     if (!passed) {
-      print(fn)
+      cat("\n", fn, "did not pass\n")
       return(NULL)
     }
 
@@ -54,7 +54,7 @@ test_pkg <- function(pkg, partial = FALSE, n = 100L) {
     cp <- compare_rd(orig, out)
     expect_true(cp)
     if (!cp)
-      print(fn)
+      cat("\n", fn, "differs in content\n")
 
   })
 
