@@ -5,21 +5,21 @@ get_rdo <- function(topic, pkg = NULL) {
   get_help_file(rdoc:::help_path(topic, package = pkg))
 }
 
-check <- function(topic, pkg = NULL) {
+check_original <- function(topic, pkg = NULL) {
   o <- get_rdo(topic, pkg)
   w <- getOption('width')
   capture.output(tools::Rd2txt(o, options = list(width = w)))
 }
 
-rd_check <- function(topic) {
-  capture.output(rdoc::rd(topic, by_section = FALSE))
+check_rd <- function(topic, pkg = NULL) {
+  capture.output(rdoc::rd(topic, by_section = FALSE, package = pkg))
 }
 
 strip_lines <- function(x) {
   gsub("\\s|[[:punct:]]", "", x)
 }
 
-strip_rd <- function(x){
+strip_rd <- function(x) {
   x <- strip_lines(x)
   paste(x, collapse = "")
 }
@@ -39,9 +39,7 @@ test_pkg <- function(pkg, partial = FALSE, n = 100L) {
 
   o <- lapply(pkg_exports, function(fn) {
     out <- tryCatch(
-      capture.output(rd(
-        fn, by_section = FALSE, package = pkg
-      )),
+      check_rd(fn, pkg),
       error = function(e)
         e,
       warning = function(w)
@@ -55,10 +53,10 @@ test_pkg <- function(pkg, partial = FALSE, n = 100L) {
       return(NULL)
     }
 
-    orig <- check(fn, pkg)
-    cp <- compare_rd(orig, out)
-    expect_true(cp)
-    if (!cp)
+    o <- check_original(fn, pkg)
+    same_content <- compare_rd(o, out)
+    expect_true(same_content)
+    if (!same_content)
       cat("\n", fn, "differs in content\n")
 
   })
