@@ -65,6 +65,7 @@ fmt_inline_code <- function(l){
     return(l)
 
   l <- unlist(l)
+  l <- gsub("\\\\dots", "...", l)
   l <- tryCatch(
     prettycode::highlight(l),
     error = function(e) l,
