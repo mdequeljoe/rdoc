@@ -1,29 +1,22 @@
 context("base R docs")
 get_help_file <- getFromNamespace(".getHelpFile", "utils")
-get_rdo <- function(topic, pkg = NULL){
-  get_help_file(
-    rdoc:::help_path(topic, package = pkg)
-  )
+get_rdo <- function(topic, pkg = NULL) {
+  get_help_file(rdoc:::help_path(topic, package = pkg))
 }
-check <- function(topic, pkg = NULL){
-  capture.output(
-    tools::Rd2txt(
-      get_rdo(topic, pkg),
-      options = list(width = getOption('width'))
-    )
-  )
+check <- function(topic, pkg = NULL) {
+  o <- get_rdo(topic, pkg)
+  w <- getOption('width')
+  capture.output(tools::Rd2txt(o, options = list(width = w)))
 }
-rd_check <- function(topic){
-  capture.output(
-    rdoc::rd(topic, by_section = FALSE)
-  )
+rd_check <- function(topic) {
+  capture.output(rdoc::rd(topic, by_section = FALSE))
 }
 
-strip_lines <- function(x){
+strip_lines <- function(x) {
   gsub("\\s|[[:punct:]]", "", x)
 }
 
-compare_rd <- function(o, k){
+compare_rd <- function(o, k) {
   o <- strip_lines(o)
   o <- paste(o, collapse = "")
   k <- crayon::strip_style(k)
@@ -34,7 +27,6 @@ compare_rd <- function(o, k){
 
 
 test_pkg <- function(pkg, partial = FALSE, n = 100L) {
-
   pkg_exports <- ls(sprintf("package:%s", pkg))
 
   if (partial)
@@ -59,7 +51,10 @@ test_pkg <- function(pkg, partial = FALSE, n = 100L) {
     }
 
     orig <- check(fn, pkg)
-    expect_true(compare_rd(orig, out))
+    cp <- compare_rd(orig, out)
+    expect_true(cp)
+    if (!cp)
+      print(fn)
 
   })
 
