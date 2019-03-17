@@ -75,6 +75,8 @@ fmt_inline_code <- function(l){
   l
 }
 
+R_logo <- crayon::combine_styles("bold", "blue")
+
 format_rdo <- function(l) {
 
   att <- attributes(l)
@@ -88,9 +90,8 @@ format_rdo <- function(l) {
   })
   attributes(o) <- att
 
-  # R logo symbol
   if (tag_(o) == "\\R"){
-    x <- "<R>"
+    x <- R_logo("R")
     attr(x, "Rd_tag") <- "TEXT"
     return(x)
   }
