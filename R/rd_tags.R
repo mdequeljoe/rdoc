@@ -66,6 +66,10 @@ fmt_inline_code <- function(l){
 
   l <- unlist(l)
   l <- gsub("\\\\dots", "...", l)
+  # encode string to avoid cases like
+  # "\"\\1\"" -> "\" and "\"\\9\"" -> error
+  l <- gsub("[[:cntrl:]]", "", l)
+  l <- encodeString(l)
   l <- tryCatch(
     prettycode::highlight(l),
     error = function(e) l,
