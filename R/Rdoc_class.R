@@ -69,7 +69,12 @@ Rdoc <- R6Class(
         private$rdo <- parse_Rd(self$path)
       } else {
 
-        self$path <- help_path(self$topic, self$pkg, self$lib)
+        self$path <- utils::help(
+          self$topic,
+          self$pkg,
+          self$lib,
+          verbose = FALSE)[]
+        self$path <- self$path[1:length(self$path)]
 
         if (!length(self$path))
           stop("topic: ", self$topic, " not found")
