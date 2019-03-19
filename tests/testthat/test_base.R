@@ -1,8 +1,10 @@
 context("base R docs")
 get_help_file <- getFromNamespace(".getHelpFile", "utils")
 
-get_rdo <- function(topic, pkg = NULL) {
-  get_help_file(rdoc:::help_path(topic, package = pkg))
+get_rdo <- function(topic, pkg){
+  d <- as.call(list(utils::`help`, topic, pkg))
+  d <- eval(d)[1]
+  get_help_file(d)
 }
 
 check_original <- function(topic, pkg = NULL) {
