@@ -1,27 +1,24 @@
-#' @importFrom tools Rd2txt parse_Rd
+#' @importFrom tools Rd2txt
 #' @importFrom R6 R6Class
 Rdoc <- R6Class(
   "Rdoc",
   public = list(
     topic = NULL,
-    path = NULL,
+    help_path = NULL,
     pkg = NULL,
-    lib = NULL,
     opts = NULL,
     initialize = function(topic,
+                          help_path,
                           by_section = FALSE,
                           include_header = TRUE,
-                          options = rdoc_options(),
-                          package = NULL,
-                          lib.loc = NULL) {
+                          options = rdoc_options()) {
 
       self$topic <- topic
+      self$help_path <- help_path
       self$opts <- options
-      self$pkg <- package
-      self$lib <- lib.loc
       private$by_section <- by_section
       private$include_header <- include_header
-      private$find_rd_path()
+      private$get_rdo()
       private$replace_text_formats()
       private$rd_to_text()
       private$reflow()
@@ -63,30 +60,15 @@ Rdoc <- R6Class(
     by_section = TRUE,
     include_header = TRUE,
     get_help_file = getFromNamespace(".getHelpFile", "utils"),
-    find_rd_path = function(package, lib.loc){
-      if (file.exists(self$topic) && is_rd_file(self$topic)){
-        self$path <- normalizePath(self$topic)
-        private$rdo <- parse_Rd(self$path)
-      } else {
+    get_rdo = function(package, lib.loc){
 
-        self$path <- utils::help(
-          self$topic,
-          self$pkg,
-          self$lib,
-          verbose = FALSE)[]
-        self$path <- self$path[1:length(self$path)]
+      if (length(self$help_path) > 1)
+        private$select_path()
 
-        if (!length(self$path))
-          stop("topic: ", self$topic, " not found")
+      self$pkg <- get_pkg(self$help_path)
 
-        if (length(self$path) > 1)
-          private$select_path()
+      private$rdo <- private$get_help_file(self$help_path)
 
-        if (is.null(self$pkg))
-          self$pkg <- get_pkg(self$path)
-
-        private$rdo <- private$get_help_file(self$path)
-      }
       invisible(self)
     },
     #save 'output' rd text for further formatting
@@ -132,7 +114,6 @@ Rdoc <- R6Class(
     append_ = function(l) Reduce(append, l)
   )
 )
-
 Rdoc$set("private", "format_code_sections", function(){
 
   code_sections <- c("examples", "example", "usage")
