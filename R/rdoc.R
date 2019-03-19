@@ -4,7 +4,8 @@ rd_ <- function(which = NULL) {
            include_header = TRUE,
            options = rdoc_options(),
            package = NULL,
-           lib.loc = NULL) {
+           lib.loc = NULL){
+
     if (is.function(topic))
       topic <- as.character(substitute(topic))
 
@@ -14,14 +15,18 @@ rd_ <- function(which = NULL) {
         package <- p
     }
 
-    doc <-
-      Rdoc$new(topic,
-               by_section,
-               include_header,
-               options,
-               package,
-               lib.loc)
-    doc$show(which)
+    k <- as.call(list(
+      utils::`help`,
+      topic,
+      package,
+      lib.loc
+    ))
+    k <- eval(k)[]
+    help_path <- k[1L:length(k)]
+
+    d <-
+      Rdoc$new(topic, help_path, by_section, include_header, options)
+    d$show(which)
   }
 }
 
