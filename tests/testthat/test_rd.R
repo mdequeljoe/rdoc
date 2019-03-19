@@ -21,6 +21,14 @@ test_that("rd produces text output", {
   x <- cap_(rd(min, by_section = FALSE))
   test_(x)
 
-  x <- cap_(rd(min, by_section = FALSE, package = base))
+  fn <- "min"
+  x <- cap_(rd(fn, by_section = FALSE))
+  test_(x)
+
+  pkg <- "base"
+  x <- cap_(rd("min", by_section = FALSE, package = pkg))
+  test_(x)
+
+  x <- cap_(rd(min, by_section = FALSE, package = "base"))
   test_(x)
 })
