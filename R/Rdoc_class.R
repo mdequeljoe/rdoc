@@ -4,17 +4,16 @@ Rdoc <- R6Class(
   "Rdoc",
   public = list(
     topic = NULL,
-    help_path = NULL,
+    path = NULL,
     pkg = NULL,
     opts = NULL,
     initialize = function(topic,
-                          help_path,
+                          path,
                           by_section = FALSE,
                           include_header = TRUE,
                           options = rdoc_options()) {
-
       self$topic <- topic
-      self$help_path <- help_path
+      self$path <- path
       self$opts <- options
       private$by_section <- by_section
       private$include_header <- include_header
@@ -60,14 +59,14 @@ Rdoc <- R6Class(
     by_section = TRUE,
     include_header = TRUE,
     get_help_file = getFromNamespace(".getHelpFile", "utils"),
-    get_rdo = function(package, lib.loc){
+    get_rdo = function(){
 
-      if (length(self$help_path) > 1)
+      if (length(self$path) > 1)
         private$select_path()
 
-      self$pkg <- get_pkg(self$help_path)
+      self$pkg <- get_pkg(self$path)
 
-      private$rdo <- private$get_help_file(self$help_path)
+      private$rdo <- private$get_help_file(self$path)
 
       invisible(self)
     },
