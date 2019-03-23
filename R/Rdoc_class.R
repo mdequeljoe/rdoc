@@ -87,21 +87,16 @@ Rdoc <- R6Class(
       invisible(self)
     },
     list_sections = function() {
-      # maybe get headers from rdo not txt?
       o <- private$rd_txt
-      headers <- which(grepl("^([[:punct:]]?)_\\b", o))
-      nm <- character(length(headers))
+      headers <- id_headers(o)
+      section_names <- as_title(o[headers])
+      o[headers] <- self$opts$section(section_names)
+      section_ends <- c(headers[-1] - 1, length(o))
       sections <- lapply(seq_along(headers), function(i) {
-        h <- headers[i]
-        nm[i] <<- tolower(gsub("_\b|:", "", o[h]))
-        o[h] <<- self$opts$section(o[h])
-        if (i == length(headers))
-          return(o[headers[i]:length(o)])
-        o[h:(headers[i + 1] - 1L)]
+        o[headers[i]:section_ends[i]]
       })
-      names(sections) <- nm
+      names(sections) <- tolower(section_names)
       private$rd_sections <- sections
-
       invisible(self)
     },
     reflow = function(){
@@ -174,13 +169,19 @@ Rdoc$set("private", "show_pkg_header", function() {
   invisible(self)
 })
 
-
-
 get_pkg <- function(path)
   basename(dirname(dirname(path)))
 
 is_rd_file <- function(path)
   grepl(".+\\.[R|r]d$", path)
+
+id_headers <- function(rdtxt){
+  which(grepl("^([[:punct:]]?)_\\b", rdtxt))
+}
+
+as_title <- function(h){
+  gsub("_\b|:", "", h)
+}
 
 reflow_lines <- function(x, w){
 
