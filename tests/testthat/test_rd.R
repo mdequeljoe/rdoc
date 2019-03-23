@@ -1,14 +1,15 @@
 context("rd")
 
 cap_ <- capture.output
+test_ <- function(x){
+  expect_true(length(x) > 0L)
+  expect_true(is.character(x))
+  expect_true(grepl("min", x[1]))
+  expect_true(grepl("\\{base\\}", x[1]))
+}
 
 test_that("rd produces text output", {
-  test_ <- function(x){
-    expect_true(length(x) > 0L)
-    expect_true(is.character(x))
-    expect_true(grepl("min", x[1]))
-    expect_true(grepl("\\{base\\}", x[1]))
-  }
+
   x <- cap_(rd("min", by_section = FALSE))
   test_(x)
 
@@ -36,4 +37,26 @@ test_that("rd produces text output", {
 
   x <- cap_(rd(min, by_section = FALSE, package = "base"))
   test_(x)
+
+})
+
+test_that("rd_question produces text output", {
+
+  x <- cap_(rd_question(min))
+  test_(x)
+
+  x <- cap_(rd_question(base::min))
+  test_(x)
+
+  x <- cap_(rd_question("min"))
+  test_(x)
+})
+
+test_that("rdoc overrides ?", {
+  rdoc()
+  expect_true("rd_question" %in% searchpaths())
+  x <- cap_(?min)
+  test_(x)
+  rdoc()
+  expect_true(!"rd_question" %in% searchpaths())
 })

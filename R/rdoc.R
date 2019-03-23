@@ -76,6 +76,54 @@ rd_example <- rd_("examples")
 rd_examples <- rd_example
 
 
+rd_question <- function(type, topic) {
+  type <- substitute(type)
+  topic <- substitute(topic)
+
+  if (missing(topic)) {
+    topic <- type
+    k <- as.call(list(utils::`?`, topic))
+  } else {
+    k <- as.call(list(utils::`?`, type, topic))
+  }
+
+  k <- eval(k)[]
+  help_path <- k[1L:length(k)]
+  topic <- as.character(topic)
+  topic <- topic[length(topic)]
+
+  opts <- getOption("rdoc.options", rdoc_options())
+  by_section <- getOption("rdoc.by_section", FALSE)
+  include_header <- getOption("rdoc.include_header", TRUE)
+
+  d <-
+    Rdoc$new(topic,
+             help_path,
+             by_section = by_section,
+             include_header = include_header,
+             options = opts)
+  d$show()
+}
+
+#' rdoc
+#' rdoc-style \code{?} replacement for \code{utils::`?`}
+#'
+#' @details
+#' Calling \code{rdoc()}
+#' @export
+rdoc <- function(){
+
+  if ("rd_question" %in% searchpaths()){
+    base::detach("rd_question")
+    return(invisible(NULL))
+  }
+
+  e <- new.env()
+  e$`?` <- rd_question
+  base::attach(e, name = "rd_question", warn.conflicts = FALSE)
+}
+
+
 #' R doc options
 #'
 #' Set output formatting styles
