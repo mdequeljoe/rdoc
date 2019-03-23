@@ -6,6 +6,8 @@ test_that("rd produces text output", {
   test_ <- function(x){
     expect_true(length(x) > 0L)
     expect_true(is.character(x))
+    expect_true(grepl("min", x[1]))
+    expect_true(grepl("\\{base\\}", x[1]))
   }
   x <- cap_(rd("min", by_section = FALSE))
   test_(x)

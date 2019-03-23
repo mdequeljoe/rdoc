@@ -23,7 +23,7 @@ check_rd <- function(topic, pkg = NULL) {
 }
 
 strip_lines <- function(x) {
-  gsub("\\s|[[:punct:]]", "", x)
+  gsub("\\s|[[:punct:]]|_\\\b", "", x)
 }
 
 strip_rd <- function(x) {
@@ -38,41 +38,44 @@ compare_rd <- function(o, k) {
   k == o
 }
 
-test_pkg <- function(pkg, partial = FALSE, n = 100L) {
+test_topic <- function(fn, pkg = NULL){
+  out <- tryCatch(
+    check_rd(fn, pkg),
+    error = function(e)
+      e,
+    warning = function(w)
+      w
+  )
+  passed <- !inherits(out, "condition")
+  expect_true(passed)
+
+  if (!passed) {
+    cat("\n", fn, "did not pass\n")
+    return(NULL)
+  }
+
+  o <- check_original(fn, pkg)
+  same_content <- compare_rd(o, out)
+  expect_true(same_content)
+  if (!same_content)
+    cat("\n", fn, "differs in content\n")
+  invisible(NULL)
+}
+
+test_pkg <- function(pkg, partial = FALSE, n = 100L, exclude = NULL) {
   pkg_exports <- ls(sprintf("package:%s", pkg))
+  if (!is.null(exclude))
+    pkg_exports <- pkg_exports[!pkg_exports %in% exclude]
 
   if (partial)
     pkg_exports <- pkg_exports[sample(seq_along(pkg_exports), n)]
 
-  o <- lapply(pkg_exports, function(fn) {
-    out <- tryCatch(
-      check_rd(fn, pkg),
-      error = function(e)
-        e,
-      warning = function(w)
-        w
-    )
-    passed <- !inherits(out, "condition")
-    expect_true(passed)
-
-    if (!passed) {
-      cat("\n", fn, "did not pass\n")
-      return(NULL)
-    }
-
-    o <- check_original(fn, pkg)
-    same_content <- compare_rd(o, out)
-    expect_true(same_content)
-    if (!same_content)
-      cat("\n", fn, "differs in content\n")
-
-  })
-
+  o <- lapply(pkg_exports, test_topic, pkg = pkg)
   invisible(NULL)
 }
 
 test_that("base package docs output without error or warning", {
   test_pkg("utils", TRUE, 30)
-  test_pkg("base", TRUE, 30)
+  test_pkg("base", TRUE, 30, exclude = c("intToUtf8", "utf8ToInt"))
   test_pkg("stats", TRUE, 30)
 })
