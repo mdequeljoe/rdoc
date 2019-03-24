@@ -109,7 +109,7 @@ rd_question <- function(type, topic) {
 #' rdoc-style \code{?} replacement for \code{utils::`?`}
 #'
 #' @details
-#' Calling \code{rdoc()}
+#' Calling \code{rdoc()} will override \code{utils::`?`}
 #' @export
 rdoc <- function(){
 

@@ -15,7 +15,9 @@ Rdoc <- R6Class(
       self$topic <- topic
       self$path <- path
       self$opts <- options
-      private$by_section <- by_section
+      private$has_color <- crayon::has_color()
+      private$in_term <- isatty(stdout())
+      private$by_section <- !private$in_term && by_section
       private$include_header <- include_header
       private$get_rdo()
       private$replace_text_formats()
@@ -25,14 +27,27 @@ Rdoc <- R6Class(
     },
     show = function(which = NULL){
 
+
       private$list_sections()
       private$format_code_sections()
-      private$show_pkg_header()
 
       s <- private$rd_sections
 
+      if (private$in_term){
+        Sys.setenv(LESS = "-R")
+        tf <- tempfile(fileext = ".Rtxt")
+        #private$show_pkg_header(tf)
+        conn <- file(tf, open = "w+", encoding = "native.enc")
+        writeLines(enc2utf8(s), con = conn, useBytes = TRUE)
+        close(conn)
+        file.show(tf)
+        return(invisible(self))
+      }
+
       if (!is.null(which))
         s <- s[which[which %in% names(s)]]
+
+      private$show_pkg_header()
 
       if (!private$by_section || !interactive())
         return(private$out_(s))
@@ -52,6 +67,8 @@ Rdoc <- R6Class(
     }
   ),
   private = list(
+    has_color = NULL,
+    in_term = NULL,
     rdo = NULL, #hold the Rd object
     rd_txt = NULL, #the output text
     rd_sections = NULL,
@@ -65,9 +82,7 @@ Rdoc <- R6Class(
         private$select_path()
 
       self$pkg <- get_pkg(self$path)
-
       private$rdo <- private$get_help_file(self$path)
-
       invisible(self)
     },
     #save 'output' rd text for further formatting
@@ -87,6 +102,10 @@ Rdoc <- R6Class(
       invisible(self)
     },
     list_sections = function() {
+      if (private$in_term){
+        private$rd_sections <- private$rd_txt
+        return(invisible(self))
+      }
       o <- private$rd_txt
       headers <- id_headers(o)
       section_names <- as_title(o[headers])
@@ -104,14 +123,17 @@ Rdoc <- R6Class(
       invisible(self)
     },
 
-    out_ = function(s) cat(private$append_(s), sep = "\n"),
+    out_ = function(s, file = "") cat(private$append_(s), file = file, sep = "\n"),
     append_ = function(l) Reduce(append, l)
   )
 )
+
 Rdoc$set("private", "format_code_sections", function(){
 
-  code_sections <- c("examples", "example", "usage")
+  if (private$in_term)
+    return(invisible(self))
 
+  code_sections <- c("examples", "example", "usage") # replace
   fm <- lapply(code_sections, function(d){
     if (is.null(s <- private$rd_sections[[d]]))
       return(NULL)
@@ -157,15 +179,15 @@ Rdoc$set("private", "select_path", function() {
   invisible(self)
 })
 
-Rdoc$set("private", "show_pkg_header", function() {
+Rdoc$set("private", "show_pkg_header", function(file = "") {
   if (!private$include_header)
     return(invisible(self))
   left_ <- if (is.null(self$pkg))
     self$topic
   else
     sprintf("%s {%s}", self$topic, self$pkg)
-  cat_rule(left = left_, right = R_logo("Rdoc"))
-  cat("\n")
+  cat_rule(left = left_, right = R_logo("Rdoc"), file = file)
+  cat("\n", file = file)
   invisible(self)
 })
 
