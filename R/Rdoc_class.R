@@ -34,7 +34,9 @@ Rdoc <- R6Class(
       s <- private$rd_sections
 
       if (private$in_term){
+        less_ <- Sys.getenv("LESS")
         Sys.setenv(LESS = "-R")
+        on.exit(Sys.setenv(LESS = less_))
         tf <- tempfile(fileext = ".Rtxt")
         #private$show_pkg_header(tf)
         conn <- file(tf, open = "w+", encoding = "native.enc")
