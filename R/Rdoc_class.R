@@ -39,8 +39,9 @@ Rdoc <- R6Class(
         on.exit(Sys.setenv(LESS = less_))
         tf <- tempfile(fileext = ".Rtxt")
         #private$show_pkg_header(tf)
-        conn <- file(tf, open = "w+", encoding = "native.enc")
-        writeLines(enc2utf8(s), con = conn, useBytes = TRUE)
+        conn <- file(tf, open = "w", encoding = "native.enc")
+        s <- enc2utf8(private$append_(s))
+        writeLines(s, con = conn, useBytes = TRUE)
         close(conn)
         file.show(tf)
         return(invisible(self))
@@ -77,6 +78,7 @@ Rdoc <- R6Class(
     rd_fmt = NULL,
     by_section = TRUE,
     include_header = TRUE,
+    code_sections = c("examples", "example", "usage"),
     get_help_file = getFromNamespace(".getHelpFile", "utils"),
     get_rdo = function(){
 
@@ -104,17 +106,14 @@ Rdoc <- R6Class(
       invisible(self)
     },
     list_sections = function() {
-      if (private$in_term){
-        private$rd_sections <- private$rd_txt
-        return(invisible(self))
-      }
+
       o <- private$rd_txt
-      headers <- id_headers(o)
-      section_names <- as_title(o[headers])
-      o[headers] <- self$opts$section(section_names)
-      section_ends <- c(headers[-1] - 1, length(o))
-      sections <- lapply(seq_along(headers), function(i) {
-        o[headers[i]:section_ends[i]]
+      h <- id_headers(o)
+      section_names <- as_title(o[h])
+      o[h] <- self$opts$section(section_names)
+      section_ends <- c(h[-1] - 1, length(o))
+      sections <- lapply(seq_along(h), function(i) {
+        o[h[i]:section_ends[i]]
       })
       names(sections) <- tolower(section_names)
       private$rd_sections <- sections
@@ -132,11 +131,11 @@ Rdoc <- R6Class(
 
 Rdoc$set("private", "format_code_sections", function(){
 
-  if (private$in_term)
+  if (!private$has_color)
     return(invisible(self))
 
-  code_sections <- c("examples", "example", "usage") # replace
-  fm <- lapply(code_sections, function(d){
+  cs <- private$code_sections
+  fm <- lapply(cs, function(d){
     if (is.null(s <- private$rd_sections[[d]]))
       return(NULL)
 
