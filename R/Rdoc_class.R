@@ -27,18 +27,16 @@ Rdoc <- R6Class(
     },
     show = function(which = NULL){
 
-
       private$list_sections()
       private$format_code_sections()
-
       s <- private$rd_sections
+      s <- append(private$pkg_header(), s)
 
       if (private$in_term){
         less_ <- Sys.getenv("LESS")
         Sys.setenv(LESS = "-R")
         on.exit(Sys.setenv(LESS = less_))
         tf <- tempfile(fileext = ".Rtxt")
-        #private$show_pkg_header(tf)
         conn <- file(tf, open = "w", encoding = "native.enc")
         s <- enc2utf8(private$append_(s))
         writeLines(s, con = conn, useBytes = TRUE)
@@ -47,19 +45,17 @@ Rdoc <- R6Class(
         return(invisible(self))
       }
 
-      if (!is.null(which))
+      if (!is.null(which)){
         s <- s[which[which %in% names(s)]]
-
-      private$show_pkg_header()
+        s <- append(private$pkg_header(), s)
+      }
 
       if (!private$by_section || !interactive())
         return(private$out_(s))
 
       n <- length(s)
-      i <- 2L
-
-      private$out_(s[1L:2L])
-
+      i <- 3L
+      private$out_(s[1L:i])
       while(i < n){
         p <- readline("")
         if (tolower(substr(p, 1L, 1L)) == "q")
@@ -110,7 +106,8 @@ Rdoc <- R6Class(
       o <- private$rd_txt
       h <- id_headers(o)
       section_names <- as_title(o[h])
-      o[h] <- self$opts$section(section_names)
+      if (private$has_color)
+        o[h] <- self$opts$section(section_names)
       section_ends <- c(h[-1] - 1, length(o))
       sections <- lapply(seq_along(h), function(i) {
         o[h[i]:section_ends[i]]
@@ -180,16 +177,14 @@ Rdoc$set("private", "select_path", function() {
   invisible(self)
 })
 
-Rdoc$set("private", "show_pkg_header", function(file = "") {
+Rdoc$set("private", "pkg_header", function() {
   if (!private$include_header)
-    return(invisible(self))
+    return(character(0))
   left_ <- if (is.null(self$pkg))
     self$topic
   else
     sprintf("%s {%s}", self$topic, self$pkg)
-  cat_rule(left = left_, right = R_logo("Rdoc"), file = file)
-  cat("\n", file = file)
-  invisible(self)
+  c(cli::rule(left = left_, right = R_logo("Rdoc"))[], "")
 })
 
 get_pkg <- function(path)
