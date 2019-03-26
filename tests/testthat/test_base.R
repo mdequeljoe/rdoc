@@ -1,6 +1,7 @@
 context("base R docs")
 get_help_file <- getFromNamespace(".getHelpFile", "utils")
-
+options(rdoc.header = FALSE)
+options(rdoc.by_section = FALSE)
 get_rdo <- function(topic, pkg){
   d <- as.call(list(utils::`help`, topic, pkg))
   d <- eval(d)[1]
@@ -16,8 +17,6 @@ check_original <- function(topic, pkg = NULL) {
 check_rd <- function(topic, pkg = NULL) {
   capture.output(rdoc::rd(
     topic,
-    by_section = FALSE,
-    include_header = FALSE,
     package = pkg
   ))
 }

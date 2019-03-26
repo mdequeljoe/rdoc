@@ -79,8 +79,6 @@ fmt_inline_code <- function(l){
   l
 }
 
-R_logo <- crayon::combine_styles("bold", "blue")
-
 format_rdo <- function(l) {
 
   att <- attributes(l)

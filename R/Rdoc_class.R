@@ -9,16 +9,14 @@ Rdoc <- R6Class(
     opts = NULL,
     initialize = function(topic,
                           path,
-                          by_section = FALSE,
-                          include_header = TRUE,
-                          options = rdoc_options()) {
+                          options = rd_opts()) {
       self$topic <- topic
       self$path <- path
       self$opts <- options
       private$has_color <- crayon::has_color()
       private$in_term <- isatty(stdout())
-      private$by_section <- !private$in_term && by_section
-      private$include_header <- include_header
+      private$by_section <- !private$in_term && self$opts$by_section
+      private$include_header <- self$opts$header
       private$get_rdo()
       private$replace_text_formats()
       private$rd_to_text()
@@ -107,7 +105,7 @@ Rdoc <- R6Class(
       h <- id_headers(o)
       section_names <- as_title(o[h])
       if (private$has_color)
-        o[h] <- self$opts$section(section_names)
+        o[h] <- self$opts$style$section_titles(section_names)
       section_ends <- c(h[-1] - 1, length(o))
       sections <- lapply(seq_along(h), function(i) {
         o[h[i]:section_ends[i]]
@@ -138,7 +136,7 @@ Rdoc$set("private", "format_code_sections", function(){
 
     #todo: partial highlighting - avoid text chunks (## ... ##)
     s[2:length(s)] <- tryCatch(
-      highlight(s[2:length(s)], style = self$opts$code_style),
+      highlight(s[2:length(s)], style = self$opts$style$code_style),
       error = function(e) s[2:length(s)],
       warning = function(w) s[2:length(s)]
     )
