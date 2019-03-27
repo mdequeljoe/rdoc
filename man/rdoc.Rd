@@ -2,15 +2,25 @@
 % Please edit documentation in R/rdoc.R
 \name{rdoc}
 \alias{rdoc}
-\title{rdoc
-rdoc-style \code{?} replacement for \code{utils::`?`}}
+\title{Colourised R documentation}
 \usage{
 rdoc()
 }
 \description{
-rdoc
-rdoc-style \code{?} replacement for \code{utils::`?`}
+rdoc replacements for \code{?} and \code{help}
 }
 \details{
-Calling \code{rdoc()} will override \code{utils::`?`}
+Calling \code{rdoc()} will override \code{utils::`?`} with \code{rd_question}
+and \code{utils::help} with \code{rd}
+These replacements can be unset by calling \code{rdoc()} once more.
+}
+\examples{
+\dontrun{
+
+rdoc::rdoc()
+?help
+rdoc::rdoc()
+?help
+}
+
 }

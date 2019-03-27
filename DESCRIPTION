@@ -1,11 +1,11 @@
 Package: rdoc
 Type: Package
-Title: Pretty print Rd files to the console
+Title: Print Colourised Rd Files in the Console.
 Version: 0.1.0
 Author: person("Matthew", "de Queljoe", email = "matthew.dequeljoe@gmail.com", role = c("aut", "cre")
 Maintainer: Matthew de Queljoe <matthew.dequeljoe@gmail.com>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: Extends tools::Rd2txt by adding text and colour formatting to Rd files 
+    for terminal or console output.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

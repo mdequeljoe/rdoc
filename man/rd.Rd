@@ -7,44 +7,45 @@
 \alias{rd_usage}
 \alias{rd_example}
 \alias{rd_examples}
-\title{R docs}
+\title{Colourised R documentation}
 \usage{
-rd(topic, by_section = TRUE, include_header = TRUE,
-  options = rdoc_options(), package = NULL, lib.loc = NULL)
+rd(topic, package = NULL, lib.loc = NULL)
 
-rd_details(topic, by_section = TRUE, include_header = TRUE,
-  options = rdoc_options(), package = NULL, lib.loc = NULL)
+rd_details(topic, package = NULL, lib.loc = NULL)
 
-rd_arguments(topic, by_section = TRUE, include_header = TRUE,
-  options = rdoc_options(), package = NULL, lib.loc = NULL)
+rd_arguments(topic, package = NULL, lib.loc = NULL)
 
-rd_usage(topic, by_section = TRUE, include_header = TRUE,
-  options = rdoc_options(), package = NULL, lib.loc = NULL)
+rd_usage(topic, package = NULL, lib.loc = NULL)
 
-rd_example(topic, by_section = TRUE, include_header = TRUE,
-  options = rdoc_options(), package = NULL, lib.loc = NULL)
+rd_example(topic, package = NULL, lib.loc = NULL)
 }
 \arguments{
 \item{topic}{\code{character(1)}, help topic}
 
-\item{by_section}{\code{logical(1)}, should docs be shown section by section or all
-at once? Defaults to TRUE.}
+\item{package}{\code{character(1)}, package of help topic. Defaults to
+\code{NULL}}
 
-\item{include_header}{\code{logical(1)}, should a package header be shown with documentation? Defaults to TRUE.}
-
-\item{options}{named list. Defaults to \code{rdoc_options()}}
-
-\item{package}{\code{character(1)}, package of help topic. Defaults to NULL.}
-
-\item{lib.loc}{\code{character(1)}, library location of package. Defaults to null.}
+\item{lib.loc}{\code{character(1)}, library location of package. Defaults to
+\code{NULL}}
 }
 \description{
-Refer to colourised \R docs in the console
+Refer to colourised \R docs as terminal/console output. Provides a
+replacement for \code{help}. A number of common section accessors are also
+provided.
+}
+\details{
+The manner in which content is outputted depends on where it is
+  being used. If used from a terminal the contents will be outputted via
+  \code{file.show}. If used from a console the output will be printed to
+  screens by sections unless this has been disabled via
+  \code{options(rdoc.by_section = FALSE)}. In this case pressing any key will
+  print out the next section. Exiting out early is possible with the 'q' key.
+  Color support is checked via \code{crayon::has_color()}.
 }
 \examples{
 \dontrun{
 
-rd("rd", by_section = FALSE)
+rd("rd")
 rd(grepl)
 rd_example("min")
 rd_usage(substr)
