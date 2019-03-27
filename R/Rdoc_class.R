@@ -20,7 +20,6 @@ Rdoc <- R6Class(
       private$get_rdo()
       private$replace_text_formats()
       private$rd_to_text()
-      private$reflow()
       invisible(self)
     },
     show = function(which = NULL){
@@ -111,14 +110,11 @@ Rdoc <- R6Class(
         o[h[i]:section_ends[i]]
       })
       names(sections) <- tolower(section_names)
+      txt <- !names(sections) %in% private$code_sections
+      sections[txt] <- lapply(sections[txt], reflow_lines)
       private$rd_sections <- sections
       invisible(self)
     },
-    reflow = function(){
-      private$rd_txt <- reflow_lines(private$rd_txt, getOption('width'))
-      invisible(self)
-    },
-
     out_ = function(s, file = "") cat(private$append_(s), file = file, sep = "\n"),
     append_ = function(l) Reduce(append, l)
   )
@@ -199,38 +195,44 @@ as_title <- function(h){
   gsub("_\b|:", "", h)
 }
 
-reflow_lines <- function(x, w){
-
+reflow_lines <- function(x) {
   i <- 1
+  m <- max(nchar(x))
   while (i < length(x)) {
-
-    t <- !has_style(x[i]) ||
-      !nzchar(x[i + 1]) ||
-      !grepl("\\S", x[i + 1]) ||
-      grepl("^([[:punct:]]?)_\\b", x[i + 1])
-
-    if (t) {
+    if (any_blank(x[c(i, i + 1)])) {
       i <- i + 1
       next
     }
 
-    olen <- nchar(strip_style(x[i]))
-    nlen <- if (has_style(x[i + 1]))
-      nchar(strip_style(x[i + 1]))
-    else
-      nchar(x[i + 1])
+    lx <- nchar(strip_style(x[i]))
+    lx2 <- nchar(strip_style(x[i + 1]))
+    open_space <- m - lx
 
-    open_space <- w - olen
-
-    if (nlen <= open_space) {
-      x[i] <- paste(x[i], rm_indent(x[i + 1]))
+    if (lx2 <= open_space) {
+      x[i] <- paste(x[i], rm_ind(x[i + 1]))
       x <- x[-(i + 1)]
+    } else {
+      x_ <- rm_ind(x[i + 1])
+      sx <- spaces(x_)
+      s <- spaces(strip_style(x_))
+      s <- s[s <= open_space]
+      if (length(s)) {
+        s <- sx[which(s == max(s))]
+        x[i] <- paste(x[i], substr(x_, 1, s))
+        x[i + 1] <-
+          paste0(ind(x[i + 1]),
+                 substr(x_, s + 1, nchar(x_)))
+      }
+      i <- i + 1
     }
-    i <- i + 1
+
   }
   x
 }
 
-rm_indent <- function(x) sub("^\\s+(\\S+)", "\\1", x)
-line_spaces <- function(x)
+any_blank <- function(x) any(!nzchar(x))
+lrx <- "^([[:blank:]]+)(.+)"
+ind <- function(x) sub(lrx, "\\1", x)
+rm_ind <- function(x) sub(lrx, "\\2", x)
+spaces <- function(x)
   gregexpr("\\s", x)[[1L]]
