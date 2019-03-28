@@ -7,27 +7,31 @@ Rdoc <- R6Class(
     path = NULL,
     pkg = NULL,
     opts = NULL,
+    which = NULL,
     initialize = function(topic,
                           path,
+                          which = NULL,
                           options = rd_opts()) {
       self$topic <- topic
       self$path <- path
+      self$which <- which
       self$opts <- options
       private$has_color <- crayon::has_color()
       private$in_term <- isatty(stdout())
-      private$by_section <- !private$in_term && self$opts$by_section
+      private$by_section <- !private$in_term &&
+        self$opts$by_section &&
+        interactive()
       private$include_header <- self$opts$header
       private$get_rdo()
       private$replace_text_formats()
       private$rd_to_text()
       invisible(self)
     },
-    show = function(which = NULL){
+    show = function(){
 
       private$list_sections()
       private$format_code_sections()
-      s <- private$rd_sections
-      s <- append(private$pkg_header(), s)
+      s <- c(private$pkg_header(), private$rd_sections)
 
       if (private$in_term){
         less_ <- Sys.getenv("LESS")
@@ -42,12 +46,7 @@ Rdoc <- R6Class(
         return(invisible(self))
       }
 
-      if (!is.null(which)){
-        s <- s[which[which %in% names(s)]]
-        s <- append(private$pkg_header(), s)
-      }
-
-      if (!private$by_section || !interactive())
+      if (!private$by_section)
         return(private$out_(s))
 
       n <- length(s)
@@ -73,52 +72,56 @@ Rdoc <- R6Class(
     include_header = TRUE,
     code_sections = c("examples", "example", "usage"),
     get_help_file = getFromNamespace(".getHelpFile", "utils"),
-    get_rdo = function(){
-
-      if (length(self$path) > 1)
-        private$select_path()
-
-      self$pkg <- get_pkg(self$path)
-      private$rdo <- private$get_help_file(self$path)
-      invisible(self)
-    },
-    #save 'output' rd text for further formatting
-    rd_to_text = function(){
-      tmp_ <- tempfile(fileext = ".txt")
-      Rd2txt(
-        private$rdo,
-        out = tmp_,
-        options = list(
-          underline_titles = TRUE,
-          width = getOption('width'),
-          code_quote = TRUE, # maybe remove
-          item_bullet = self$opts$item_bullet
-        )
-      )
-      private$rd_txt <- readLines(tmp_)
-      invisible(self)
-    },
-    list_sections = function() {
-
-      o <- private$rd_txt
-      h <- id_headers(o)
-      section_names <- as_title(o[h])
-      if (private$has_color)
-        o[h] <- self$opts$style$section_titles(section_names)
-      section_ends <- c(h[-1] - 1, length(o))
-      sections <- lapply(seq_along(h), function(i) {
-        o[h[i]:section_ends[i]]
-      })
-      names(sections) <- tolower(section_names)
-      txt <- !names(sections) %in% private$code_sections
-      sections[txt] <- lapply(sections[txt], reflow_lines)
-      private$rd_sections <- sections
-      invisible(self)
-    },
     out_ = function(s, file = "") cat(private$append_(s), file = file, sep = "\n"),
     append_ = function(l) Reduce(append, l)
   )
 )
+
+Rdoc$set("private", "get_rdo", function(){
+  if (length(self$path) > 1)
+    private$select_path()
+  self$pkg <- get_pkg(self$path)
+  private$rdo <- private$get_help_file(self$path)
+  invisible(self)
+})
+
+Rdoc$set("private", "rd_to_text", function(){
+  tmp_ <- tempfile(fileext = ".txt")
+  Rd2txt(
+    private$rdo,
+    out = tmp_,
+    options = list(
+      underline_titles = TRUE,
+      width = getOption('width'),
+      code_quote = TRUE, # maybe remove
+      item_bullet = self$opts$item_bullet
+    )
+  )
+  private$rd_txt <- readLines(tmp_)
+  invisible(self)
+})
+
+
+Rdoc$set("private", "list_sections", function(){
+  o <- private$rd_txt
+  h <- id_headers(o)
+  section_names <- as_title(o[h])
+  if (private$has_color)
+    o[h] <- self$opts$style$section_titles(section_names)
+  section_ends <- c(h[-1] - 1, length(o))
+  sections <- lapply(seq_along(h), function(i) {
+    o[h[i]:section_ends[i]]
+  })
+  nms <- tolower(section_names)
+  names(sections) <- nms
+  if (!is.null(self$which) && self$which %in% nms)
+    sections <- sections[self$which]
+  txt <- !names(sections) %in% private$code_sections
+  if (length(txt))
+    sections[txt] <- lapply(sections[txt], reflow_lines)
+  private$rd_sections <- sections
+  invisible(self)
+})
 
 Rdoc$set("private", "format_code_sections", function(){
 
@@ -144,7 +147,8 @@ Rdoc$set("private", "format_code_sections", function(){
 })
 
 Rdoc$set("private", "replace_text_formats", function(){
-  private$rdo <- format_rdo(private$rdo)
+  if (private$has_color)
+    private$rdo <- format_rdo(private$rdo)
   invisible(self)
 })
 
@@ -161,7 +165,7 @@ Rdoc$set("private", "select_path", function() {
       )
     cat(msg)
     selection <- readline("")
-    s <- as.numeric(substr(selection, 1, 1))
+    s <- substr(selection, 1, 1)
     if (!s %in% id)
       s <- 1L
     self$path <- self$path[s]
@@ -195,6 +199,7 @@ as_title <- function(h){
   gsub("_\b|:", "", h)
 }
 
+#' @importFrom crayon strip_style has_style
 reflow_lines <- function(x) {
   i <- 1
   m <- max(nchar(x))

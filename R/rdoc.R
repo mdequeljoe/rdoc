@@ -23,8 +23,8 @@ rd_ <- function(which = NULL) {
     help_path <- k[1L:length(k)]
 
     d <-
-      Rdoc$new(topic, help_path, rd_opts())
-    d$show(which)
+      Rdoc$new(topic, help_path, which, rd_opts())
+    d$show()
   }
 }
 

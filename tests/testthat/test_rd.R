@@ -53,11 +53,11 @@ test_that("rd_question produces text output", {
   test_(x)
 })
 
-test_that("rdoc overrides ?", {
-  rdoc()
-  expect_true("rdoc" %in% searchpaths())
-  x <- cap_(?min)
-  test_(x)
-  rdoc()
-  expect_true(!"rdoc" %in% searchpaths())
-})
+# test_that("rdoc overrides ?", {
+#   rdoc()
+#   expect_true("rdoc" %in% searchpaths())
+#   x <- cap_(?min)
+#   test_(x)
+#   rdoc()
+#   expect_true(!"rdoc" %in% searchpaths())
+# })
