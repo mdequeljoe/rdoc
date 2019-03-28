@@ -218,21 +218,25 @@ reflow_lines <- function(x) {
       s <- s[s <= open_space]
       if (length(s)) {
         s <- sx[which(s == max(s))]
-        x[i] <- paste(x[i], substr(x_, 1, s))
+        x[i] <- paste(x[i], substr(x_, 1, s - 1L))
         x[i + 1] <-
           paste0(ind(x[i + 1]),
-                 substr(x_, s + 1, nchar(x_)))
+                 substr(x_, s + 1L, nchar(x_)))
       }
       i <- i + 1
     }
-
   }
   x
 }
 
 any_blank <- function(x) any(!nzchar(x))
-lrx <- "^([[:blank:]]+)(.+)"
-ind <- function(x) sub(lrx, "\\1", x)
-rm_ind <- function(x) sub(lrx, "\\2", x)
-spaces <- function(x)
-  gregexpr("\\s", x)[[1L]]
+rx <- function() "^([[:blank:]]+)?(.+)"
+ind <- function(x) sub(rx(), "\\1", x)
+rm_ind <- function(x) sub(rx(), "\\2", x)
+spaces <- function(x){
+  s <- gregexpr("\\s", x)[[1L]]
+  if (s[1L] == -1L)
+    return(numeric(0))
+  s
+}
+
