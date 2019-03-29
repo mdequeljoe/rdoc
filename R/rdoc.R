@@ -28,13 +28,13 @@ rd_ <- function(which = NULL) {
   }
 }
 
-#' Colourised R documentation
+#' Colourised \R documentation
 #'
 #' Refer to colourised \R docs as terminal/console output. Provides a
-#' replacement for \code{help}. A number of common section accessors are also
+#' replacement for \code{help}. A number of common (substantive) section accessors are also
 #' provided.
-#' @family rd access
-#' @aliases rd
+#' @family rdoc access
+#' @aliases rdoc
 #' @param topic \code{character(1)}, help topic
 #' @param package \code{character(1)}, package of help topic. Defaults to
 #'   \code{NULL}
@@ -51,41 +51,46 @@ rd_ <- function(which = NULL) {
 #'
 #' @examples \dontrun{
 #'
-#' rd("rd")
-#' rd(grepl)
-#' rd_example("min")
-#' rd_usage(substr)
+#' rdoc("rdoc")
+#' rdoc_examples("min")
+#' rdoc_usage(substr)
 #'
 #' }
 #' @export
-rd <- rd_()
+rdoc <- rd_()
 
 
-#' @rdname rd
+#' @rdname rdoc
 #' @export
-rd_details <- rd_("details")
+rdoc_usage <- rd_("usage")
 
-#' @rdname rd
+#' @rdname rdoc
 #' @export
-rd_arguments <- rd_("arguments")
+rdoc_arguments <- rd_("arguments")
 
-#' @rdname rd
+#' @rdname rdoc
 #' @export
-rd_usage <- rd_("usage")
+rdoc_details <- rd_("details")
 
-#' @rdname rd
+#' @rdname rdoc
 #' @aliases rd_examples
 #' @export
-rd_example <- rd_("examples")
+rdoc_examples <- rd_("examples")
 
-#' @export
-rd_examples <- rd_example
-
-#' rd ?
-#' @inherit rd details
+#' Colourised \R documentation
+#'
+#' Refer to colourised \R docs as terminal/console output. Provides a
+#' replacement for \code{?}.
+#' @inherit rdoc details
+#' @inheritParams utils::`?`
 #' @importFrom utils ?
+#' @examples \dontrun{
+#'
+#' rdoc_question(lapply)
+#'
+#' }
 #' @export
-rd_question <- function(type, topic) {
+rdoc_question <- function(type, topic) {
   type <- substitute(type)
   topic <- substitute(topic)
 
@@ -112,27 +117,36 @@ rd_question <- function(type, topic) {
 #'
 #' rdoc replacements for \code{?} and \code{help}
 #'
+#' @family use_rdoc shim
+#' @aliases use_rdoc
 #' @details
-#' Calling \code{rdoc()} will override \code{utils::`?`} with \code{rd_question}
+#' Calling \code{use_rdoc()} will override \code{utils::`?`} with \code{rd_question}
 #' and \code{utils::help} with \code{rd}
-#' These replacements can be unset by calling \code{rdoc()} once more.
+#' These replacements can be unset by calling \code{rm_rdoc()}.
 #' @examples \dontrun{
 #'
-#' rdoc::rdoc()
+#' rdoc::use_rdoc()
 #' ?help
-#' rdoc::rdoc()
+#' rdoc::rm_rdoc()
 #' ?help
 #' }
 #'
 #' @export
-rdoc <- function(){
+use_rdoc <- function(){
 
-  if ("rdoc" %in% searchpaths()){
-    detach("rdoc")
+  if ("rdoc" %in% search())
     return(invisible(NULL))
-  }
 
   e <- new.env()
-  e$`?` <- rd_question
-  attach(e, name = "rdoc", warn.conflicts = FALSE)
+  e$`?` <- rdoc_question
+  e$help <- rdoc
+  base::attach(e, name = "rdoc", warn.conflicts = FALSE)
+}
+
+#' @rdname use_rdoc
+#' @export
+rm_rdoc <- function(){
+  if (!"rdoc" %in% search())
+    return(invisible(NULL))
+  base::detach("rdoc")
 }

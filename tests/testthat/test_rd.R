@@ -11,53 +11,53 @@ test_ <- function(x){
 
 test_that("rd produces text output", {
 
-  x <- cap_(rd("min"))
+  x <- cap_(rdoc("min"))
   test_(x)
 
-  xd <- cap_(rd_details("min"))
+  xd <- cap_(rdoc_details("min"))
   test_(xd)
   expect_true(length(xd) < length(x))
 
-  xe <- cap_(rd_example("min"))
+  xe <- cap_(rdoc_examples("min"))
   test_(xe)
   expect_true(length(xe) < length(x))
 
-  x <- cap_(rd(min))
+  x <- cap_(rdoc(min))
   test_(x)
 
   fn <- "min"
-  x <- cap_(rd(fn))
+  x <- cap_(rdoc(fn))
   test_(x)
 
   pkg <- "base"
-  x <- cap_(rd("min", package = pkg))
+  x <- cap_(rdoc("min", package = pkg))
   test_(x)
 
-  x <- cap_(rd_details(min, package = base))
+  x <- cap_(rdoc_details(min, package = base))
   test_(x)
 
-  x <- cap_(rd(min, package = "base"))
+  x <- cap_(rdoc(min, package = "base"))
   test_(x)
 
 })
 
 test_that("rd_question produces text output", {
 
-  x <- cap_(rd_question(min))
+  x <- cap_(rdoc_question(min))
   test_(x)
 
-  x <- cap_(rd_question(base::min))
+  x <- cap_(rdoc_question(base::min))
   test_(x)
 
-  x <- cap_(rd_question("min"))
+  x <- cap_(rdoc_question("min"))
   test_(x)
 })
 
 # test_that("rdoc overrides ?", {
-#   rdoc()
+#   use_rdoc()
 #   expect_true("rdoc" %in% searchpaths())
 #   x <- cap_(?min)
 #   test_(x)
-#   rdoc()
+#   rm_rdoc()
 #   expect_true(!"rdoc" %in% searchpaths())
 # })

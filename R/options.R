@@ -48,6 +48,9 @@ R_logo <- crayon::combine_styles("bold", "blue")
 #' rdoc_text_formats())}
 #' @param r_logo \R symbol
 #' @param pkg \pkg{pkg} formatting
+#' @param italic italic font
+#' @param bold bold font
+#' @param squotes single quotes
 #' @param email email
 #' @param url = NULL
 #' @param href = NULL

@@ -1,11 +1,13 @@
 Package: rdoc
 Type: Package
-Title: Print Colourised Rd Files in the Console.
+Title: Colourised R documentation
 Version: 0.1.0
 Author: person("Matthew", "de Queljoe", email = "matthew.dequeljoe@gmail.com", role = c("aut", "cre")
 Maintainer: Matthew de Queljoe <matthew.dequeljoe@gmail.com>
-Description: Extends tools::Rd2txt by adding text and colour formatting to Rd files 
-    for terminal or console output.
+Description: Extends `tools::Rd2txt` by adding customisable text and colour formatting to R documentation 
+    contents for terminal or console output. If used in a terminal, output will carried out via `file.show` 
+    otherwise contents will be printed in sections. Formatting is done via crayon<https://cran.r-project.org/web/packages/crayon/index.html>
+    and prettycode<https://cran.r-project.org/web/packages/prettycode/index.html>.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

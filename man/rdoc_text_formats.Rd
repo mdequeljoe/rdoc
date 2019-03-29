@@ -13,6 +13,12 @@ rdoc_text_formats(r_logo = R_logo, pkg = function(x) paste0("{", x,
 
 \item{pkg}{\pkg{pkg} formatting}
 
+\item{italic}{italic font}
+
+\item{bold}{bold font}
+
+\item{squotes}{single quotes}
+
 \item{email}{email}
 
 \item{url}{= NULL}

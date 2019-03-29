@@ -1,2 +1,5 @@
+^\.travis\.yml$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^src/\.vscode$
+^cran-comments\.md$

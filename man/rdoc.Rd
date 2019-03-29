@@ -2,25 +2,53 @@
 % Please edit documentation in R/rdoc.R
 \name{rdoc}
 \alias{rdoc}
-\title{Colourised R documentation}
+\alias{rdoc_usage}
+\alias{rdoc_arguments}
+\alias{rdoc_details}
+\alias{rdoc_examples}
+\alias{rd_examples}
+\title{Colourised \R documentation}
 \usage{
-rdoc()
+rdoc(topic, package = NULL, lib.loc = NULL)
+
+rdoc_usage(topic, package = NULL, lib.loc = NULL)
+
+rdoc_arguments(topic, package = NULL, lib.loc = NULL)
+
+rdoc_details(topic, package = NULL, lib.loc = NULL)
+
+rdoc_examples(topic, package = NULL, lib.loc = NULL)
+}
+\arguments{
+\item{topic}{\code{character(1)}, help topic}
+
+\item{package}{\code{character(1)}, package of help topic. Defaults to
+\code{NULL}}
+
+\item{lib.loc}{\code{character(1)}, library location of package. Defaults to
+\code{NULL}}
 }
 \description{
-rdoc replacements for \code{?} and \code{help}
+Refer to colourised \R docs as terminal/console output. Provides a
+replacement for \code{help}. A number of common (substantive) section accessors are also
+provided.
 }
 \details{
-Calling \code{rdoc()} will override \code{utils::`?`} with \code{rd_question}
-and \code{utils::help} with \code{rd}
-These replacements can be unset by calling \code{rdoc()} once more.
+The manner in which content is outputted depends on where it is
+  being used. If used from a terminal the contents will be outputted via
+  \code{file.show}. If used from a console the output will be printed to
+  screens by sections unless this has been disabled via
+  \code{options(rdoc.by_section = FALSE)}. In this case pressing any key will
+  print out the next section. Exiting out early is possible with the 'q' key.
+  Color support is checked via \code{crayon::has_color()}.
 }
 \examples{
 \dontrun{
 
-rdoc::rdoc()
-?help
-rdoc::rdoc()
-?help
-}
+rdoc("rdoc")
+rdoc_examples("min")
+rdoc_usage(substr)
 
 }
+}
+\concept{rdoc access}
