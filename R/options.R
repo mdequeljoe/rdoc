@@ -42,8 +42,6 @@ rdoc_style <- function(pkg_header = cli::rule,
   c(out, item_bullet = item_bullet)
 }
 
-R_logo <- crayon::combine_styles("bold", "blue")
-
 #' Rdoc text formatting
 #'
 #' Set Rd text format defaults to be supplied to \code{options(rdoc.text_formats
@@ -61,8 +59,8 @@ R_logo <- crayon::combine_styles("bold", "blue")
 #' style functions for `inline_code`) or NULL. Functions must take and return a
 #' vector: \code{character(1)} If set as the latter, the relevant text will be
 #' displayed using the defaults of \code{tools::Rd2txt}
-
-rdoc_text_formats <- function(r_logo = R_logo,
+#' @export
+rdoc_text_formats <- function(r_logo = crayon::combine_styles("bold", "blue"),
                               pkg = function(x)
                                 paste0("{", x, "}"),
                               inline_code = prettycode::default_style(),
@@ -73,7 +71,7 @@ rdoc_text_formats <- function(r_logo = R_logo,
                               url = NULL,
                               href = NULL) {
   out <- list(
-    r_logo = R_logo,
+    r_logo = r_logo,
     pkg = pkg,
     inline_code = inline_code,
     italic = italic,

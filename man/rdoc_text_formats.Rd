@@ -4,10 +4,11 @@
 \alias{rdoc_text_formats}
 \title{Rdoc text formatting}
 \usage{
-rdoc_text_formats(r_logo = R_logo, pkg = function(x) paste0("{", x,
-  "}"), inline_code = prettycode::default_style(),
-  italic = crayon::italic, bold = crayon::bold, squotes = NULL,
-  email = NULL, url = NULL, href = NULL)
+rdoc_text_formats(r_logo = crayon::combine_styles("bold", "blue"),
+  pkg = function(x) paste0("{", x, "}"),
+  inline_code = prettycode::default_style(), italic = crayon::italic,
+  bold = crayon::bold, squotes = NULL, email = NULL, url = NULL,
+  href = NULL)
 }
 \arguments{
 \item{r_logo}{\R symbol}

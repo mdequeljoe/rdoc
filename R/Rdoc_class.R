@@ -187,7 +187,7 @@ Rdoc$set("private", "pkg_header", function() {
     self$topic
   else
     sprintf("%s {%s}", self$topic, self$pkg)
-  c(cli::rule(left = left_, right = R_logo("Rdoc"))[], "")
+  c(cli::rule(left = left_, right = self$opts$text_formats$r_logo("Rdoc"))[], "")
 })
 
 get_pkg <- function(path)
