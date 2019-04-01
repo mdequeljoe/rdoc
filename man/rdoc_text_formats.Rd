@@ -5,13 +5,16 @@
 \title{Rdoc text formatting}
 \usage{
 rdoc_text_formats(r_logo = R_logo, pkg = function(x) paste0("{", x,
-  "}"), italic = crayon::italic, bold = crayon::bold, squotes = NULL,
+  "}"), inline_code = prettycode::default_style(),
+  italic = crayon::italic, bold = crayon::bold, squotes = NULL,
   email = NULL, url = NULL, href = NULL)
 }
 \arguments{
 \item{r_logo}{\R symbol}
 
-\item{pkg}{\pkg{pkg} formatting}
+\item{pkg}{\pkg{pkg} references}
+
+\item{inline_code}{inline code}
 
 \item{italic}{italic font}
 
@@ -21,15 +24,17 @@ rdoc_text_formats(r_logo = R_logo, pkg = function(x) paste0("{", x,
 
 \item{email}{email}
 
-\item{url}{= NULL}
+\item{url}{url}
 
-\item{href}{= NULL}
+\item{href}{href}
 }
 \description{
-Set Rd text format defaults to be supplied to \code{options(rdoc.text_formats =
-rdoc_text_formats())}
+Set Rd text format defaults to be supplied to \code{options(rdoc.text_formats
+= rdoc_text_formats())}
 }
 \details{
-All inputs must either be a function or NULL. If set as the latter, the relevant text
-will be displayed using the defaults of \code{tools::Rd2txt}
+All inputs must either be a function (exceptionally as a list of
+style functions for `inline_code`) or NULL. Functions must take and return a
+vector: \code{character(1)} If set as the latter, the relevant text will be
+displayed using the defaults of \code{tools::Rd2txt}
 }

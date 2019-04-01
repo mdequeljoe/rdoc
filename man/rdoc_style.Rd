@@ -31,5 +31,7 @@ Set Rd output formatting styles to be supplied to \code{options(rdoc.style =
 rdoc_style())}
 }
 \details{
-all inputs with the exception of \code{item_bullet} should be functions.
+all inputs should be functions with the exception of
+  \code{code_style} which should be a list of functions and
+  \code{item_bullet} which should be a \code{character(1)}.
 }

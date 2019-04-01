@@ -106,19 +106,24 @@ Rdoc$set("private", "list_sections", function(){
   o <- private$rd_txt
   h <- id_headers(o)
   section_names <- as_title(o[h])
+
   if (private$has_color)
     o[h] <- self$opts$style$section_titles(section_names)
   section_ends <- c(h[-1] - 1, length(o))
   sections <- lapply(seq_along(h), function(i) {
     o[h[i]:section_ends[i]]
   })
+
   nms <- tolower(section_names)
   names(sections) <- nms
-  if (!is.null(self$which) && self$which %in% nms)
+
+  if (isTRUE(self$which %in% nms))
     sections <- sections[self$which]
+
   txt <- !names(sections) %in% private$code_sections
   if (length(txt))
     sections[txt] <- lapply(sections[txt], reflow_lines)
+
   private$rd_sections <- sections
   invisible(self)
 })
@@ -148,7 +153,7 @@ Rdoc$set("private", "format_code_sections", function(){
 
 Rdoc$set("private", "replace_text_formats", function(){
   if (private$has_color)
-    private$rdo <- format_rdo(private$rdo)
+    private$rdo <- format_rdo(private$rdo, self$opts$text_formats)
   invisible(self)
 })
 

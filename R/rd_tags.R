@@ -6,9 +6,9 @@ tag_ <- function(l, default = character(1)) {
   x
 }
 
-get_subtags <- function(l){
-  subtag_ <- function(l){
-    lapply(l, function(d){
+get_subtags <- function(l) {
+  subtag_ <- function(l) {
+    lapply(l, function(d) {
       if (is.list(d) && length(d))
         subtag_(d)
       else
@@ -19,13 +19,13 @@ get_subtags <- function(l){
   unlist(l)
 }
 
-apply_fmt <- function(l, op, cl){
-  lapply(l, function(d){
+apply_fmt <- function(l, f) {
+  lapply(l, function(d) {
     at <- attributes(d)
     if (is.list(d))
-      x <- apply_fmt(d, op, cl)
+      x <- apply_fmt(d, f)
     else
-      x <- paste0(op, d, cl)
+      x <- f(d)
     attributes(x) <- at
     x
   })
@@ -46,66 +46,85 @@ apply_fmt <- function(l, op, cl){
 #   put("*")
 # },
 
-convert_tag <- function(op, cl){
-  function(l) {
-    l <- apply_fmt(l, op, cl)
-    attr(l, "Rd_tag") <- "\\special"
-    l
-  }
-}
-
-fmt_italics <- convert_tag("\033[3m", "\033[23m")
-fmt_bold <- convert_tag("\033[1m", "\033[22m")
-fmt_squotes <- convert_tag("'", "'")
-
-fmt_inline_code <- function(l){
-  st <- get_subtags(l)
-
-  if (!all(st == "RCODE"))
+format_tag <- function(l, f, tag = "\\special", as_list = TRUE) {
+  if (is.null(f))
     return(l)
-
-  l <- unlist(l)
-  l <- gsub("\\\\dots", "...", l)
-  # encode string to avoid cases like
-  # "\"\\1\"" -> "\" and "\"\\9\"" -> error
-  l <- gsub("[[:cntrl:]]", "", l)
-  l <- encodeString(l)
-  l <- tryCatch(
-    prettycode::highlight(l),
-    error = function(e) l,
-    warning = function(w) l
-  )
-  attr(l, "Rd_tag") <- "TEXT"
+  l <- apply_fmt(l, f)
+  if (!as_list)
+    l <- unlist(l, recursive = FALSE)
+  attr(l, "Rd_tag") <- tag
   l
 }
 
-format_rdo <- function(l) {
+fmt_inline_code <-
+  function(l, styles = prettycode::default_style()) {
+    st <- get_subtags(l)
 
-  att <- attributes(l)
-  if (tag_(l) %in% c("\\example", "\\examples", "\\usage"))
-    return(l)
+    if (!all(st == "RCODE"))
+      return(l)
 
-  o <- lapply(l, function(d) {
-    if (is.list(d))
-      d <- format_rdo(d)
-    d
-  })
-  attributes(o) <- att
-
-  if (tag_(o) == "\\R"){
-    x <- R_logo("R")
-    attr(x, "Rd_tag") <- "TEXT"
-    return(x)
+    l <- unlist(l)
+    l <- gsub("\\\\dots", "...", l)
+    # encode string to avoid cases like
+    # "\"\\1\"" -> "\" and "\"\\9\"" -> error
+    l <- gsub("[[:cntrl:]]", "", l)
+    l <- encodeString(l)
+    l <- tryCatch(
+      prettycode::highlight(l, styles),
+      error = function(e)
+        l,
+      warning = function(w)
+        l
+    )
+    attr(l, "Rd_tag") <- "TEXT"
+    l
   }
 
-  if (tag_(o) == "\\code")
-    return(fmt_inline_code(o))
+format_rdo <-
+  function(l,
+           opts = rdoc_text_formats(),
+           exclude = c("\\example", "\\examples", "\\usage")) {
+    format_rdo_ <- function(l) {
+      if (tag_(l) %in% exclude)
+        return(l)
 
-  if (tag_(o) == "\\emph")
-    return(fmt_italics(o))
+      att <- attributes(l)
+      o <- lapply(l, function(d) {
+        if (is.list(d))
+          d <- format_rdo_(d)
+        d
+      })
+      attributes(o) <- att
 
-  if (tag_(o) == "\\bold" || tag_(o) == "\\strong")
-    return(fmt_bold(o))
-  o
-}
+      if (tag_(o) == "\\R" && !is.null(opts$r_logo)){
+        x <- opts$r_logo("R")
+        attr(x, "Rd_tag") <- "TEXT"
+        return(x)
+      }
 
+      if (tag_(o) == "\\pkg")
+        return(format_tag(o, opts$pkg))
+
+      if (tag_(o) == "\\code")
+        return(fmt_inline_code(o, opts$inline_code))
+
+      if (tag_(o) == "\\emph")
+        return(format_tag(o, opts$italic))
+
+      if (tag_(o) == "\\bold" || tag_(o) == "\\strong")
+        return(format_tag(o, opts$bold))
+
+      if (tag_(o) == "\\email")
+        return(format_tag(o, opts$email))
+
+      if (tag_(o) == "\\url")
+        return(format_tag(o, opts$url))
+
+      if (tag_(o) == "\\href")
+        return(format_tag(o, opts$href))
+
+      o
+    }
+
+    format_rdo_(l)
+  }
