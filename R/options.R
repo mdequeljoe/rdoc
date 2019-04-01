@@ -2,7 +2,6 @@
 #'
 #' Set Rd output formatting styles to be supplied to \code{options(rdoc.style =
 #' rdoc_style())}
-#' @param pkg_header package header information. Defaults to \code{cli::rule}
 #' @param title topic title. Defaults to \code{crayon::bold}
 #' @param section_titles section titles Defaults to \code{crayon::underline}
 #' @param arg_params argument parameters. Defaults to \code{crayon::underline}
@@ -18,15 +17,12 @@
 #' @import prettycode
 #' @import cli
 #' @export
-rdoc_style <- function(pkg_header = cli::rule,
-                     title = crayon::bold,
-                     section_titles = crayon::underline,
-                     arg_params = crayon::underline,
-                     code_style = prettycode::default_style(),
-                     item_bullet = cli::symbol$bullet) {
-
+rdoc_style <- function(title = crayon::bold,
+                       section_titles = crayon::underline,
+                       arg_params = crayon::underline,
+                       code_style = prettycode::default_style(),
+                       item_bullet = cli::symbol$bullet) {
   out <- list(
-    pkg_header = pkg_header,
     title = title,
     section_titles = section_titles,
     arg_params = arg_params,
@@ -60,35 +56,35 @@ rdoc_style <- function(pkg_header = cli::rule,
 #' vector: \code{character(1)} If set as the latter, the relevant text will be
 #' displayed using the defaults of \code{tools::Rd2txt}
 #' @export
-rdoc_text_formats <- function(r_logo = crayon::combine_styles("bold", "blue"),
-                              pkg = function(x)
-                                paste0("{", x, "}"),
-                              inline_code = prettycode::default_style(),
-                              italic = crayon::italic,
-                              bold = crayon::bold,
-                              squotes = NULL,
-                              email = NULL,
-                              url = NULL,
-                              href = NULL) {
-  out <- list(
-    r_logo = r_logo,
-    pkg = pkg,
-    inline_code = inline_code,
-    italic = italic,
-    bold = bold,
-    squotes = squotes,
-    email = email,
-    url = url,
-    href = href
-  )
-  stopifnot(is_valid_opt(out))
-  out
-}
+rdoc_text_formats <-
+  function(r_logo = crayon::combine_styles("bold", "blue"),
+           pkg = function(x)
+             paste0("{", x, "}"),
+           inline_code = prettycode::default_style(),
+           italic = crayon::italic,
+           bold = crayon::bold,
+           squotes = NULL,
+           email = NULL,
+           url = NULL,
+           href = NULL) {
+    out <- list(
+      r_logo = r_logo,
+      pkg = pkg,
+      inline_code = inline_code,
+      italic = italic,
+      bold = bold,
+      squotes = squotes,
+      email = email,
+      url = url,
+      href = href
+    )
+    stopifnot(is_valid_opt(out))
+    out
+  }
 
-is_valid_opt <- function(l){
-  valid_ <- function(l){
-    lapply(l, function(d){
-
+is_valid_opt <- function(l) {
+  valid_ <- function(l) {
+    lapply(l, function(d) {
       if (is.list(d))
         is_valid_opt(d)
       else
@@ -98,7 +94,7 @@ is_valid_opt <- function(l){
   all(unlist(valid_(l)))
 }
 
-rd_opts <- function(){
+rd_opts <- function() {
   list(
     header = getOption("rdoc.header", TRUE),
     by_section = getOption("rdoc.by_section", TRUE),

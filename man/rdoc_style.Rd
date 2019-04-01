@@ -4,14 +4,12 @@
 \alias{rdoc_style}
 \title{Rdoc style options}
 \usage{
-rdoc_style(pkg_header = cli::rule, title = crayon::bold,
-  section_titles = crayon::underline, arg_params = crayon::underline,
+rdoc_style(title = crayon::bold, section_titles = crayon::underline,
+  arg_params = crayon::underline,
   code_style = prettycode::default_style(),
   item_bullet = cli::symbol$bullet)
 }
 \arguments{
-\item{pkg_header}{package header information. Defaults to \code{cli::rule}}
-
 \item{title}{topic title. Defaults to \code{crayon::bold}}
 
 \item{section_titles}{section titles Defaults to \code{crayon::underline}}
