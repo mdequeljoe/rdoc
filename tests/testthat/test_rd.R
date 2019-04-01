@@ -39,6 +39,7 @@ test_that("rd produces text output", {
   x <- cap_(rdoc(min, package = "base"))
   test_(x)
 
+  expect_true(inherits(rdoc("function_is_not_found"), "help_files_with_topic"))
 })
 
 test_that("rd_question produces text output", {
@@ -51,6 +52,12 @@ test_that("rd_question produces text output", {
 
   x <- cap_(rdoc_question("min"))
   test_(x)
+
+  expect_true(inherits(
+    rdoc_question("function_is_not_found"),
+    "help_files_with_topic"
+  ))
+
 })
 
 # test_that("rdoc overrides ?", {

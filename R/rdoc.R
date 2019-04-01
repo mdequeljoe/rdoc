@@ -19,7 +19,9 @@ rd_ <- function(which = NULL) {
       package,
       lib.loc
     ))
-    k <- eval(k)[]
+    k <- tryCatch(eval(k), error = function(e) e)
+    if (!length(k))
+      return(k)
     help_path <- k[1L:length(k)]
 
     d <-
@@ -101,7 +103,9 @@ rdoc_question <- function(type, topic) {
     k <- as.call(list(utils::`?`, type, topic))
   }
 
-  k <- eval(k)[]
+  k <- tryCatch(eval(k), error = function(e) e)
+  if (!length(k))
+    return(k)
   help_path <- k[1L:length(k)]
   topic <- as.character(topic)
   topic <- topic[length(topic)]
