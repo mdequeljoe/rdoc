@@ -128,14 +128,18 @@ Rdoc$set("private", "list_sections", function(){
   invisible(self)
 })
 
-Rdoc$set("private", "format_sections", function(){
+Rdoc$set("private", "format_sections", function() {
   if (!private$has_color)
     return(invisible(self))
 
   o <- private$rd_sections
+  i <- 1
+  if (length(o) > 1) {
+    o[[1]][1] <- self$style$title(o[[1]][1])
+    i <- 1
+  }
 
-  o[[1]][1] <- self$style$title(o[[1]][1])
-  o[2:length(o)] <- lapply(o[2:length(o)], function(d){
+  o[i:length(o)] <- lapply(o[i:length(o)], function(d) {
     d[1] <- self$style$section_titles(d[1])
     d
   })
@@ -151,17 +155,6 @@ Rdoc$set("private", "format_args", function(a){
   format_args(a, self$style$arguments)
 })
 
-set_styles <- function(l){
-  lapply(l, function(x) if (is.null(x)) function(x) x else x)
-}
-
-format_args <- function(x, f){
-  rx <- "^(\\s*)([[:alnum:]|\\._]+)(:)"
-  arg <- grepl(rx, x)
-  x[arg] <- gsub(rx, paste0("\\1", f("\\2"), "\\3"), x[arg])
-  x
-}
-
 Rdoc$set("private", "reflow_sections", function(){
   if (!private$has_color)
     return(invisible(self))
@@ -172,22 +165,22 @@ Rdoc$set("private", "reflow_sections", function(){
   invisible(self)
 })
 
-
 Rdoc$set("private", "format_code_sections", function(){
 
   if (!private$has_color)
     return(invisible(self))
 
-  cs <- private$code_sections
-  fm <- lapply(cs, function(d){
+  fm <- lapply(private$code_sections, function(d){
+
     if (is.null(s <- private$rd_sections[[d]]))
       return(NULL)
 
     #todo: partial highlighting - avoid text chunks (## ... ##)
-    s[2:length(s)] <- tryCatch(
-      highlight(s[2:length(s)], style = self$style$code_style),
-      error = function(e) s[2:length(s)],
-      warning = function(w) s[2:length(s)]
+    rng <- 2:length(s)
+    s[rng] <- tryCatch(
+      highlight(s[rng], style = self$style$code_style),
+      error = function(e) s[rng],
+      warning = function(w) s[rng]
     )
 
     private$rd_sections[[d]] <<- s
@@ -232,66 +225,11 @@ Rdoc$set("private", "pkg_header", function() {
     self$topic
   else
     sprintf("%s {%s}", self$topic, self$pkg)
-  c(cli::rule(left = left_, right = self$text_formats$r_logo("Rdoc"))[], "")
+  c(cli::rule(
+    left = left_,
+    right = self$text_formats$r_logo("rdoc"),
+    width = getOption('width')
+  )[],
+  "")
 })
-
-get_pkg <- function(path)
-  basename(dirname(dirname(path)))
-
-is_rd_file <- function(path)
-  grepl(".+\\.[R|r]d$", path)
-
-id_headers <- function(rdtxt){
-  which(grepl("^([[:punct:]]?)_\\b", rdtxt))
-}
-
-as_title <- function(h){
-  gsub("_\b|:", "", h)
-}
-
-#' @importFrom crayon strip_style has_style
-reflow_lines <- function(x) {
-  i <- 1
-  m <- max(nchar(x))
-  while (i < length(x)) {
-    if (any_blank(x[c(i, i + 1)])) {
-      i <- i + 1
-      next
-    }
-
-    lx <- nchar(strip_style(x[i]))
-    lx2 <- nchar(strip_style(x[i + 1]))
-    open_space <- m - lx
-
-    if (lx2 <= open_space) {
-      x[i] <- paste(x[i], rm_ind(x[i + 1]))
-      x <- x[-(i + 1)]
-    } else {
-      x_ <- rm_ind(x[i + 1])
-      sx <- spaces(x_)
-      s <- spaces(strip_style(x_))
-      s <- s[s <= open_space]
-      if (length(s)) {
-        s <- sx[which(s == max(s))]
-        x[i] <- paste(x[i], substr(x_, 1, s - 1L))
-        x[i + 1] <-
-          paste0(ind(x[i + 1]),
-                 substr(x_, s + 1L, nchar(x_)))
-      }
-      i <- i + 1
-    }
-  }
-  x
-}
-
-any_blank <- function(x) any(!nzchar(x))
-rx <- function() "^([[:blank:]]+)?(.+)"
-ind <- function(x) sub(rx(), "\\1", x)
-rm_ind <- function(x) sub(rx(), "\\2", x)
-spaces <- function(x){
-  s <- gregexpr("\\s", x)[[1L]]
-  if (s[1L] == -1L)
-    return(numeric(0))
-  s
-}
 
