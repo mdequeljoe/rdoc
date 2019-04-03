@@ -2,24 +2,20 @@
 % Please edit documentation in R/options.R
 \name{rdoc_style}
 \alias{rdoc_style}
-\title{Rdoc style options}
+\title{rdoc style options}
 \usage{
 rdoc_style(title = crayon::bold, section_titles = crayon::underline,
-  arg_params = crayon::underline,
-  code_style = prettycode::default_style(),
-  item_bullet = cli::symbol$bullet)
+  arguments = NULL, code_style = prettycode::default_style())
 }
 \arguments{
-\item{title}{topic title. Defaults to \code{crayon::bold}}
+\item{title}{topic title.}
 
-\item{section_titles}{section titles Defaults to \code{crayon::underline}}
+\item{section_titles}{section titles}
 
-\item{arg_params}{argument parameters. Defaults to \code{crayon::underline}}
+\item{arguments}{argument parameters.}
 
-\item{code_style}{code sections and inline code. Defaults to
-\code{prettycode::default_style()}}
-
-\item{item_bullet}{item bullet points. Defaults to \code{cli::symbol$bullet}}
+\item{code_style}{code sections and inline code styles to be passed on to
+\code{prettycode::highlight}}
 }
 \value{
 A list
@@ -29,7 +25,6 @@ Set Rd output formatting styles to be supplied to \code{options(rdoc.style =
 rdoc_style())}
 }
 \details{
-all inputs should be functions with the exception of
-  \code{code_style} which should be a list of functions and
-  \code{item_bullet} which should be a \code{character(1)}.
+all inputs should be functions or \code{NULL} with the exception of
+  \code{code_style} which should be a list of functions.
 }

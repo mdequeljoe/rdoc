@@ -6,7 +6,9 @@ Rdoc <- R6Class(
     topic = NULL,
     path = NULL,
     pkg = NULL,
-    opts = NULL,
+    style = NULL,
+    text_formats = NULL,
+    item_bullet = NULL,
     which = NULL,
     initialize = function(topic,
                           path,
@@ -15,13 +17,15 @@ Rdoc <- R6Class(
       self$topic <- topic
       self$path <- path
       self$which <- which
-      self$opts <- options
+      self$style <- set_styles(options$style)
+      self$text_formats <- options$text_formats
+      self$item_bullet <- options$item_bullet
       private$has_color <- crayon::has_color()
       private$in_term <- isatty(stdout())
       private$by_section <- !private$in_term &&
-        self$opts$by_section &&
+        options$by_section &&
         interactive()
-      private$include_header <- self$opts$header
+      private$include_header <- options$header
       private$get_rdo()
       private$replace_text_formats()
       private$rd_to_text()
@@ -30,7 +34,10 @@ Rdoc <- R6Class(
     show = function(){
 
       private$list_sections()
+      private$format_sections()
+      private$reflow_sections()
       private$format_code_sections()
+
       s <- c(private$pkg_header(), private$rd_sections)
 
       if (private$in_term){
@@ -105,28 +112,66 @@ Rdoc$set("private", "rd_to_text", function(){
 Rdoc$set("private", "list_sections", function(){
   o <- private$rd_txt
   h <- id_headers(o)
-  section_names <- as_title(o[h])
+  o[h] <- as_title(o[h])
+  nms <- tolower(o[h])
 
-  if (private$has_color)
-    o[h] <- self$opts$style$section_titles(section_names)
   section_ends <- c(h[-1] - 1, length(o))
   sections <- lapply(seq_along(h), function(i) {
     o[h[i]:section_ends[i]]
   })
-
-  nms <- tolower(section_names)
   names(sections) <- nms
 
   if (isTRUE(self$which %in% nms))
     sections <- sections[self$which]
 
-  txt <- !names(sections) %in% private$code_sections
-  if (length(txt))
-    sections[txt] <- lapply(sections[txt], reflow_lines)
-
   private$rd_sections <- sections
   invisible(self)
 })
+
+Rdoc$set("private", "format_sections", function(){
+  if (!private$has_color)
+    return(invisible(self))
+
+  o <- private$rd_sections
+
+  o[[1]][1] <- self$style$title(o[[1]][1])
+  o[2:length(o)] <- lapply(o[2:length(o)], function(d){
+    d[1] <- self$style$section_titles(d[1])
+    d
+  })
+
+  if (length(o$arguments))
+    o$arguments <- private$format_args(o$arguments)
+
+  private$rd_sections <- o
+  invisible(self)
+})
+
+Rdoc$set("private", "format_args", function(a){
+  format_args(a, self$style$arguments)
+})
+
+set_styles <- function(l){
+  lapply(l, function(x) if (is.null(x)) function(x) x else x)
+}
+
+format_args <- function(x, f){
+  rx <- "^(\\s*)([[:alnum:]|\\._]+)(:)"
+  arg <- grepl(rx, x)
+  x[arg] <- gsub(rx, paste0("\\1", f("\\2"), "\\3"), x[arg])
+  x
+}
+
+Rdoc$set("private", "reflow_sections", function(){
+  if (!private$has_color)
+    return(invisible(self))
+  txt <- !names(private$rd_sections) %in% private$code_sections
+  if (length(txt))
+    private$rd_sections[txt] <-
+      lapply(private$rd_sections[txt], reflow_lines)
+  invisible(self)
+})
+
 
 Rdoc$set("private", "format_code_sections", function(){
 
@@ -140,7 +185,7 @@ Rdoc$set("private", "format_code_sections", function(){
 
     #todo: partial highlighting - avoid text chunks (## ... ##)
     s[2:length(s)] <- tryCatch(
-      highlight(s[2:length(s)], style = self$opts$style$code_style),
+      highlight(s[2:length(s)], style = self$style$code_style),
       error = function(e) s[2:length(s)],
       warning = function(w) s[2:length(s)]
     )
@@ -153,7 +198,7 @@ Rdoc$set("private", "format_code_sections", function(){
 
 Rdoc$set("private", "replace_text_formats", function(){
   if (private$has_color)
-    private$rdo <- format_rdo(private$rdo, self$opts$text_formats)
+    private$rdo <- format_rdo(private$rdo, self$text_formats)
   invisible(self)
 })
 
@@ -187,7 +232,7 @@ Rdoc$set("private", "pkg_header", function() {
     self$topic
   else
     sprintf("%s {%s}", self$topic, self$pkg)
-  c(cli::rule(left = left_, right = self$opts$text_formats$r_logo("Rdoc"))[], "")
+  c(cli::rule(left = left_, right = self$text_formats$r_logo("Rdoc"))[], "")
 })
 
 get_pkg <- function(path)

@@ -1,16 +1,14 @@
-#' Rdoc style options
+#' rdoc style options
 #'
 #' Set Rd output formatting styles to be supplied to \code{options(rdoc.style =
 #' rdoc_style())}
-#' @param title topic title. Defaults to \code{crayon::bold}
-#' @param section_titles section titles Defaults to \code{crayon::underline}
-#' @param arg_params argument parameters. Defaults to \code{crayon::underline}
-#' @param code_style code sections and inline code. Defaults to
-#'   \code{prettycode::default_style()}
-#' @param item_bullet item bullet points. Defaults to \code{cli::symbol$bullet}
-#' @details all inputs should be functions with the exception of
-#'   \code{code_style} which should be a list of functions and
-#'   \code{item_bullet} which should be a \code{character(1)}.
+#' @param title topic title.
+#' @param section_titles section titles
+#' @param arguments argument parameters.
+#' @param code_style code sections and inline code styles to be passed on to
+#'   \code{prettycode::highlight}
+#' @details all inputs should be functions or \code{NULL} with the exception of
+#'   \code{code_style} which should be a list of functions.
 #'
 #' @return A list
 #' @import crayon
@@ -19,13 +17,12 @@
 #' @export
 rdoc_style <- function(title = crayon::bold,
                        section_titles = crayon::underline,
-                       arg_params = crayon::underline,
-                       code_style = prettycode::default_style(),
-                       item_bullet = cli::symbol$bullet) {
+                       arguments = NULL,
+                       code_style = prettycode::default_style()) {
   out <- list(
     title = title,
     section_titles = section_titles,
-    arg_params = arg_params,
+    arguments = arguments,
     code_style = code_style
   )
   stopifnot(is_valid_opt(out))
@@ -34,8 +31,7 @@ rdoc_style <- function(title = crayon::bold,
   if (!all(valid_entry))
     stop("possible entries to code_style are: ",
          paste(style_names, collapse = ", "))
-  stopifnot(is.character(item_bullet))
-  c(out, item_bullet = item_bullet)
+  out
 }
 
 #' Rdoc text formatting
@@ -99,6 +95,7 @@ rd_opts <- function() {
     header = getOption("rdoc.header", TRUE),
     by_section = getOption("rdoc.by_section", TRUE),
     style = getOption("rdoc.style", rdoc_style()),
-    text_formats = getOption("rdoc.text_formats", rdoc_text_formats())
+    text_formats = getOption("rdoc.text_formats", rdoc_text_formats()),
+    item_bullet = getOption("rdoc.item_bullet", cli::symbol$bullet)
   )
 }
