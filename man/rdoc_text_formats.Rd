@@ -7,7 +7,8 @@
 rdoc_text_formats(r_logo = crayon::combine_styles("bold", "blue"),
   pkg = function(x) paste0("{", x, "}"),
   inline_code = prettycode::default_style(), italic = crayon::italic,
-  bold = crayon::bold, squotes = NULL, email = NULL, url = NULL,
+  bold = crayon::bold, table = list(float = "center", border_style =
+  "double-single", align = "left"), email = NULL, url = NULL,
   href = NULL)
 }
 \arguments{
@@ -21,7 +22,7 @@ rdoc_text_formats(r_logo = crayon::combine_styles("bold", "blue"),
 
 \item{bold}{bold font}
 
-\item{squotes}{single quotes}
+\item{table}{tabular, options to pass to \code{cli::boxx}}
 
 \item{email}{email}
 

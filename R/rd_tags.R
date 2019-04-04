@@ -1,4 +1,4 @@
-#convert rd tags to their corresponding formatting
+#convert rd tags to their corresponding text formatting
 
 tag_ <- function(l, default = character(1)) {
   if (is.null(x <- attr(l, "Rd_tag")))
@@ -56,17 +56,16 @@ format_tag <- function(l, f, tag = "\\special", as_list = TRUE) {
   l
 }
 
-fmt_inline_code <-
+format_inline_code <-
   function(l, styles = prettycode::default_style()) {
-    st <- get_subtags(l)
 
-    if (!all(st == "RCODE"))
+    if (!all(get_subtags(l) == "RCODE"))
       return(l)
 
-    l <- unlist(l)
-    l <- gsub("\\\\dots", "...", l)
     # encode string to avoid cases like
     # "\"\\1\"" -> "\" and "\"\\9\"" -> error
+    l <- unlist(l)
+    l <- gsub("\\\\dots", "...", l)
     l <- gsub("[[:cntrl:]]", "", l)
     l <- encodeString(l)
     l <- tryCatch(
@@ -80,11 +79,43 @@ fmt_inline_code <-
     l
   }
 
+# a unlist->paste->strsplit won't always work
+# since tabs and cr may be confounded as they
+#   are represented as:
+#   structure(list(), Rd_tag = "\\tab")
+#   structure(list(), Rd_tag = "\\cr")
+format_table <- function(l, box_options = NULL) {
+  v <- vapply(l[[2]], function(d) {
+    if (tag_(d) == "\\tab")
+      return(" ")
+    if (tag_(d) == "\\cr")
+      return("\n")
+    d
+  }, character(1))
+
+  if (v[1] == "\n")
+    v <- v[-1]
+  v <- paste(v, collapse = "")
+  v <- strsplit(v, "\n")
+  if (!is.null(box_options))
+    v <- c(v, box_options)
+  do.call(boxx, v)[]
+}
+
+# format rdo
+# return formatted rd object as well as list as formatted tables
+# can't replace tables directly since Rd2txt will interfere with
+# the formatting by stripping blankspaces and line breaks.
+# tables are substituted in later via the tags ##>>RDOC_TABLE_n
+
 format_rdo <-
   function(l,
            opts = rdoc_text_formats(),
            exclude = c("\\example", "\\examples", "\\usage")) {
+
+    tabular <- list()
     format_rdo_ <- function(l) {
+
       if (tag_(l) %in% exclude)
         return(l)
 
@@ -102,11 +133,19 @@ format_rdo <-
         return(x)
       }
 
+      if (tag_(o) == "\\tabular"){
+        v <- format_table(o, opts$table)
+        tabular[length(tabular) + 1] <<- v
+        x <- paste0("##>>RDOC_TABLE_", length(tabular))
+        attr(x, "Rd_tag") <- "TEXT"
+        return(x)
+      }
+
       if (tag_(o) == "\\pkg")
         return(format_tag(o, opts$pkg))
 
       if (tag_(o) == "\\code")
-        return(fmt_inline_code(o, opts$inline_code))
+        return(format_inline_code(o, opts$inline_code))
 
       if (tag_(o) == "\\emph")
         return(format_tag(o, opts$italic))
@@ -126,5 +165,6 @@ format_rdo <-
       o
     }
 
-    format_rdo_(l)
+   fm <- format_rdo_(l)
+   list(rdo = fm, tables = tabular)
   }

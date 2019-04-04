@@ -48,6 +48,8 @@ test_that("line reflow works as expected", {
          "4 5")
   xr <- reflow_lines(x)
   expect_equal(xr, c("1 2 3 4", "1 2 3 4", "5"))
+  xr <- reflow_lines(x, exclude = "4")
+  expect_equal(xr, c("1 2 3 4", "1 2 3", "4 5"))
 
 })
 
@@ -70,8 +72,4 @@ test_that("line reflow with styles works as expected", {
   x2 <- gsub("\\s", "", paste(x, collapse = ""))
   expect_equal(x, x2)
 })
-
-
-
-
 

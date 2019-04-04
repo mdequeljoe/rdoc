@@ -11,9 +11,6 @@
 #'   \code{code_style} which should be a list of functions.
 #'
 #' @return A list
-#' @import crayon
-#' @import prettycode
-#' @import cli
 #' @export
 rdoc_style <- function(title = crayon::bold,
                        section_titles = crayon::underline,
@@ -43,7 +40,7 @@ rdoc_style <- function(title = crayon::bold,
 #' @param inline_code inline code
 #' @param italic italic font
 #' @param bold bold font
-#' @param squotes single quotes
+#' @param table tabular, options to pass to \code{cli::boxx}
 #' @param email email
 #' @param url url
 #' @param href href
@@ -59,7 +56,9 @@ rdoc_text_formats <-
            inline_code = prettycode::default_style(),
            italic = crayon::italic,
            bold = crayon::bold,
-           squotes = NULL,
+           table = list(float = "center",
+                         border_style = "double-single",
+                         align = "left"),
            email = NULL,
            url = NULL,
            href = NULL) {
@@ -69,13 +68,13 @@ rdoc_text_formats <-
       inline_code = inline_code,
       italic = italic,
       bold = bold,
-      squotes = squotes,
       email = email,
       url = url,
       href = href
     )
     stopifnot(is_valid_opt(out))
-    out
+    stopifnot(is.list(table))
+    c(out, table = list(table))
   }
 
 is_valid_opt <- function(l) {

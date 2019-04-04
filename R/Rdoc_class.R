@@ -36,6 +36,7 @@ Rdoc <- R6Class(
       private$list_sections()
       private$format_sections()
       private$reflow_sections()
+      private$replace_tables()
       private$format_code_sections()
 
       s <- c(private$pkg_header(), private$rd_sections)
@@ -66,12 +67,14 @@ Rdoc <- R6Class(
         i <- i + 1
         private$out_(s[i])
       }
+      invisible(self)
     }
   ),
   private = list(
     has_color = NULL,
     in_term = NULL,
     rdo = NULL, #hold the Rd object
+    tables = NULL, #formatted tables
     rd_txt = NULL, #the output text
     rd_sections = NULL,
     rd_fmt = NULL,
@@ -89,7 +92,7 @@ Rdoc$set("private", "get_rdo", function(){
     private$select_path()
   self$pkg <- get_pkg(self$path)
   private$rdo <- private$get_help_file(self$path)
-  invisible(self)
+  invisible(NULL)
 })
 
 Rdoc$set("private", "rd_to_text", function(){
@@ -105,7 +108,7 @@ Rdoc$set("private", "rd_to_text", function(){
     )
   )
   private$rd_txt <- readLines(tmp_)
-  invisible(self)
+  invisible(NULL)
 })
 
 
@@ -125,18 +128,18 @@ Rdoc$set("private", "list_sections", function(){
     sections <- sections[self$which]
 
   private$rd_sections <- sections
-  invisible(self)
+  invisible(NULL)
 })
 
 Rdoc$set("private", "format_sections", function() {
   if (!private$has_color)
-    return(invisible(self))
+    return(invisible(NULL))
 
   o <- private$rd_sections
   i <- 1
   if (length(o) > 1) {
     o[[1]][1] <- self$style$title(o[[1]][1])
-    i <- 1
+    i <- 2
   }
 
   o[i:length(o)] <- lapply(o[i:length(o)], function(d) {
@@ -145,30 +148,40 @@ Rdoc$set("private", "format_sections", function() {
   })
 
   if (length(o$arguments))
-    o$arguments <- private$format_args(o$arguments)
+    o$arguments <- format_args(o$arguments, self$style$arguments)
 
   private$rd_sections <- o
-  invisible(self)
-})
-
-Rdoc$set("private", "format_args", function(a){
-  format_args(a, self$style$arguments)
+  invisible(NULL)
 })
 
 Rdoc$set("private", "reflow_sections", function(){
   if (!private$has_color)
-    return(invisible(self))
+    return(invisible(NULL))
   txt <- !names(private$rd_sections) %in% private$code_sections
   if (length(txt))
     private$rd_sections[txt] <-
-      lapply(private$rd_sections[txt], reflow_lines)
-  invisible(self)
+      lapply(private$rd_sections[txt], reflow_lines, exclude = "##>>RDOC_")
+  invisible(NULL)
+})
+
+Rdoc$set("private", "replace_tables", function() {
+  if (!length(private$tables))
+    return(invisible(NULL))
+  private$rd_sections <- lapply(private$rd_sections, function(d) {
+    tb <- grepl("##>>RDOC_TABLE", d)
+    d[tb] <- vapply(d[tb], function(x) {
+      id <- gsub(".+_([0-9]+)$", "\\1", x)
+      private$tables[[as.numeric(id)]]
+    }, character(1))
+    d
+  })
+  invisible(NULL)
 })
 
 Rdoc$set("private", "format_code_sections", function(){
 
   if (!private$has_color)
-    return(invisible(self))
+    return(invisible(NULL))
 
   fm <- lapply(private$code_sections, function(d){
 
@@ -182,17 +195,18 @@ Rdoc$set("private", "format_code_sections", function(){
       error = function(e) s[rng],
       warning = function(w) s[rng]
     )
-
     private$rd_sections[[d]] <<- s
   })
-
-  invisible(self)
+  invisible(NULL)
 })
 
 Rdoc$set("private", "replace_text_formats", function(){
-  if (private$has_color)
-    private$rdo <- format_rdo(private$rdo, self$text_formats)
-  invisible(self)
+  if (private$has_color){
+    x <- format_rdo(private$rdo, self$text_formats)
+    private$rdo <- x$rdo
+    private$tables <- x$tables
+  }
+  invisible(NULL)
 })
 
 Rdoc$set("private", "select_path", function() {
@@ -215,7 +229,7 @@ Rdoc$set("private", "select_path", function() {
   } else
     self$path <- self$path[1L]
 
-  invisible(self)
+  invisible(NULL)
 })
 
 Rdoc$set("private", "pkg_header", function() {

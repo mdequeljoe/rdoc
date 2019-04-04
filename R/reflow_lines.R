@@ -1,9 +1,21 @@
-#' @importFrom crayon strip_style has_style
-reflow_lines <- function(x) {
+
+# line reflowing - takes ANSI sequences into consideration
+# x - character()
+# exclude - regular expression to filter lines to exclude from re-flow
+reflow_lines <- function(x, exclude = NULL) {
+
+  if (!is.null(exclude))
+    exclude <- which(grepl(exclude, x))
+
+  m <- if (length(exclude))
+    max(nchar(x[-exclude]))
+  else
+    max(nchar(x))
+
   i <- 1
-  m <- max(nchar(x))
   while (i < length(x)) {
-    if (any_blank(x[c(i, i + 1)])) {
+
+    if (any_blank(x[c(i, i + 1)]) || i %in% exclude) {
       i <- i + 1
       next
     }
