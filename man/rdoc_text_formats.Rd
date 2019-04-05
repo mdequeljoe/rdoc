@@ -16,7 +16,8 @@ rdoc_text_formats(r_logo = crayon::combine_styles("bold", "blue"),
 
 \item{pkg}{\pkg{pkg} references}
 
-\item{inline_code}{inline code}
+\item{inline_code}{inline code, options to pass to the \code{style} argument of
+\code{prettycode::highlight}}
 
 \item{italic}{italic font}
 
@@ -35,8 +36,9 @@ Set Rd text format defaults to be supplied to \code{options(rdoc.text_formats
 = rdoc_text_formats())}
 }
 \details{
-All inputs must either be a function (exceptionally as a list of
-style functions for `inline_code`) or NULL. Functions must take and return a
-vector: \code{character(1)} If set as the latter, the relevant text will be
-displayed using the defaults of \code{tools::Rd2txt}
+All inputs must either be a function, a list of functions
+   (\code{inline_code} and \code{table}), or NULL. Functions must take and return
+  a character vector. If set as NULL, the relevant text will
+  be displayed using the defaults of \code{tools::Rd2txt} or the calling function
+  it is passed to.
 }

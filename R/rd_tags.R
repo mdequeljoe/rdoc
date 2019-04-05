@@ -84,6 +84,7 @@ format_inline_code <-
 #   are represented as:
 #   structure(list(), Rd_tag = "\\tab")
 #   structure(list(), Rd_tag = "\\cr")
+#' @importFrom cli boxx
 format_table <- function(l, box_options = NULL) {
   v <- vapply(l[[2]], function(d) {
     if (tag_(d) == "\\tab")

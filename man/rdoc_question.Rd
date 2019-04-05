@@ -26,17 +26,20 @@ rdoc_question(type, topic)
   }
 }
 \description{
-Refer to colourised \R docs as terminal/console output. Provides a
-replacement for \code{?}.
+Refer to colourised \R docs as terminal output. Provides a
+replacement for \code{?}. Meant primarily for use as an
+override in \code{use_rdoc()}
 }
 \details{
 The manner in which content is outputted depends on where it is
   being used. If used from a terminal the contents will be outputted via
-  \code{file.show}. If used from a console the output will be printed to
-  screens by sections unless this has been disabled via
-  \code{options(rdoc.by_section = FALSE)}. In this case pressing any key will
-  print out the next section. Exiting out early is possible with the 'q' key.
-  Color support is checked via \code{crayon::has_color()}.
+  \code{file.show}. Otherwise the output will be printed by sections unless
+  this has been disabled via \code{options(rdoc.by_section = FALSE)}. When
+  printing by section pressing any key will print out the next section.
+  Exiting out early is possible via 'q' keypress. Color support is checked
+  via \code{crayon::has_color()}. The output styles can be modified via
+  \code{rdoc_style()} and passing this to the option:
+  \code{options(rdoc.style = rdoc_style())}
 }
 \examples{
 \dontrun{

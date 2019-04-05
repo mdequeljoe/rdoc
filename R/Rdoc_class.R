@@ -191,7 +191,7 @@ Rdoc$set("private", "format_code_sections", function(){
     #todo: partial highlighting - avoid text chunks (## ... ##)
     rng <- 2:length(s)
     s[rng] <- tryCatch(
-      highlight(s[rng], style = self$style$code_style),
+      prettycode::highlight(s[rng], style = self$style$code_style),
       error = function(e) s[rng],
       warning = function(w) s[rng]
     )

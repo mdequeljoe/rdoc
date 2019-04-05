@@ -14,8 +14,8 @@ rdoc_style(title = crayon::bold, section_titles = crayon::underline,
 
 \item{arguments}{argument parameters.}
 
-\item{code_style}{code sections and inline code styles to be passed on to
-\code{prettycode::highlight}}
+\item{code_style}{code sections (e.g. examples) and inline code
+styles to be passed on to \code{prettycode::highlight}}
 }
 \value{
 A list

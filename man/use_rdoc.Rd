@@ -13,8 +13,8 @@ rm_rdoc()
 rdoc replacements for \code{?} and \code{help}
 }
 \details{
-Calling \code{use_rdoc()} will override \code{utils::`?`} with \code{rd_question}
-and \code{utils::help} with \code{rd}
+Calling \code{use_rdoc()} will override \code{utils::`?`} with \code{rdoc_question}
+and \code{utils::help} with \code{rdoc}
 These replacements can be unset by calling \code{rm_rdoc()}.
 }
 \examples{

@@ -5,11 +5,10 @@
 #' @param title topic title.
 #' @param section_titles section titles
 #' @param arguments argument parameters.
-#' @param code_style code sections and inline code styles to be passed on to
-#'   \code{prettycode::highlight}
+#' @param code_style code sections (e.g. examples) and inline code
+#'   styles to be passed on to \code{prettycode::highlight}
 #' @details all inputs should be functions or \code{NULL} with the exception of
 #'   \code{code_style} which should be a list of functions.
-#'
 #' @return A list
 #' @export
 rdoc_style <- function(title = crayon::bold,
@@ -37,17 +36,19 @@ rdoc_style <- function(title = crayon::bold,
 #' = rdoc_text_formats())}
 #' @param r_logo \R symbol
 #' @param pkg \pkg{pkg} references
-#' @param inline_code inline code
+#' @param inline_code inline code, options to pass to the \code{style} argument of
+#'   \code{prettycode::highlight}
 #' @param italic italic font
 #' @param bold bold font
 #' @param table tabular, options to pass to \code{cli::boxx}
 #' @param email email
 #' @param url url
 #' @param href href
-#' @details All inputs must either be a function (exceptionally as a list of
-#' style functions for `inline_code`) or NULL. Functions must take and return a
-#' vector: \code{character(1)} If set as the latter, the relevant text will be
-#' displayed using the defaults of \code{tools::Rd2txt}
+#' @details All inputs must either be a function, a list of functions
+#'    (\code{inline_code} and \code{table}), or NULL. Functions must take and return
+#'   a character vector. If set as NULL, the relevant text will
+#'   be displayed using the defaults of \code{tools::Rd2txt} or the calling function
+#'   it is passed to.
 #' @export
 rdoc_text_formats <-
   function(r_logo = crayon::combine_styles("bold", "blue"),
