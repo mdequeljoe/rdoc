@@ -1,5 +1,9 @@
-
-# line reflowing - takes ANSI sequences into consideration
+#'@importFrom crayon strip_style has_style
+# line reflowing
+# Rd2txt takes the formatting applied by `format_rdo`
+#  into consideration which can result in irregular
+#  line lengths. Lines are reflowed as if no ANSI codes were present.
+#
 # x - character()
 # exclude - regular expression to filter lines to exclude from re-flow
 reflow_lines <- function(x, exclude = NULL) {
@@ -8,20 +12,22 @@ reflow_lines <- function(x, exclude = NULL) {
     exclude <- which(grepl(exclude, x))
 
   m <- if (length(exclude))
-    max(nchar(x[-exclude]))
+    max(nchar2(x[-exclude]))
   else
-    max(nchar(x))
+    max(nchar2(x))
 
   i <- 1
   while (i < length(x)) {
 
-    if (any_blank(x[c(i, i + 1)]) || i %in% exclude) {
+    i_ <- c(i, i + 1)
+    if (any_blank(x[i_]) ||
+        any(i_ %in% exclude)) {
       i <- i + 1
       next
     }
 
-    lx <- nchar(strip_style(x[i]))
-    lx2 <- nchar(strip_style(x[i + 1]))
+    lx <- nchar2(x[i])
+    lx2 <- nchar2(x[i + 1])
     open_space <- m - lx
 
     if (lx2 <= open_space) {
@@ -45,6 +51,7 @@ reflow_lines <- function(x, exclude = NULL) {
   x
 }
 
+nchar2 <- function(x) nchar(strip_style(x))
 any_blank <- function(x) any(!nzchar(x))
 rx <- function() "^([[:blank:]]+)?(.+)"
 ind <- function(x) sub(rx(), "\\1", x)

@@ -1,6 +1,5 @@
 context("line reflow")
 
-
 test_that("spaces find correct positions", {
 
   expect_equal(spaces("hello"), numeric(0))
@@ -43,33 +42,27 @@ test_that("line reflow works as expected", {
   xr <- reflow_lines(x)
   expect_equal(xr, x)
 
-  x <- c("1 2 3 4",
+  x <- c("1 2 3 9",
          "1 2 3",
          "4 5")
   xr <- reflow_lines(x)
-  expect_equal(xr, c("1 2 3 4", "1 2 3 4", "5"))
+  expect_equal(xr, c("1 2 3 9", "1 2 3 4", "5"))
+
   xr <- reflow_lines(x, exclude = "4")
-  expect_equal(xr, c("1 2 3 4", "1 2 3", "4 5"))
+  expect_equal(xr, c("1 2 3 9", "1 2 3", "4 5"))
 
-})
+  x <- c("a b c d",
+         crayon::red("a b"),
+         "c d")
 
-test_that("line reflow with styles works as expected", {
-
-  x <- c("     The minimum and maximum of a numeric empty set are \033[32m+\033[39m\033[34mInf\033[39m and",
-         "     \033[32m-\033[39m\033[34mInf\033[39m (in this order!) which ensures \033[3mtransitivity\033[23m, e.g.,",
-         "     \033[36mmin\033[39m(x1, \033[36mmin\033[39m(x2)) \033[32m==\033[39m \033[36mmin\033[39m(x1, x2).  For numeric x",
-         "     \033[36mmax\033[39m(x) \033[32m==\033[39m \033[32m-\033[39m\033[34mInf\033[39m and \033[36mmin\033[39m(x)",
-         "     \033[32m==\033[39m \033[32m+\033[39m\033[34mInf\033[39m whenever \033[36mlength\033[39m(x) \033[32m==\033[39m",
-         "     \033[34m0\033[39m (after removing missing values if requested).  However, pmax and pmin",
-         "     return \033[34mNA\033[39m if all the parallel elements are \033[34mNA\033[39m even for na.rm",
-         "     \033[32m=\033[39m \033[34mTRUE\033[39m.")
   x2 <- reflow_lines(x)
-  expect_true(length(x2) < length(x))
-  m <- max(nchar(x))
-  m2 <- max(nchar(crayon::strip_style(x2)))
-  expect_equal(m, m2)
-  x <- gsub("\\s", "", paste(x, collapse = ""))
-  x2 <- gsub("\\s", "", paste(x, collapse = ""))
-  expect_equal(x, x2)
+  expect_equal(x2[2], paste(x[2], x[3]))
+
+  x <- c("a b c d",
+         crayon::red("a b"),
+         "c d e")
+  x2 <- reflow_lines(x)
+  expect_equal(x2[2], paste(x[2], "c d"))
+
 })
 
