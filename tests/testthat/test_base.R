@@ -15,7 +15,7 @@ check_original <- function(topic, pkg = NULL) {
 }
 
 check_rd <- function(topic, pkg = NULL) {
-  capture.output(rdoc::rdoc(
+  capture.output(rdoc(
     topic,
     package = pkg
   ))

@@ -22,7 +22,7 @@ A list
 }
 \description{
 Set Rd output formatting styles to be supplied to \code{options(rdoc.style =
-rdoc_style())}
+ rdoc_style())}
 }
 \details{
 all inputs should be functions or \code{NULL} with the exception of

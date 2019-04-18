@@ -1,7 +1,7 @@
 #' rdoc style options
 #'
 #' Set Rd output formatting styles to be supplied to \code{options(rdoc.style =
-#' rdoc_style())}
+#'  rdoc_style())}
 #' @param title topic title.
 #' @param section_titles section titles
 #' @param arguments argument parameters.

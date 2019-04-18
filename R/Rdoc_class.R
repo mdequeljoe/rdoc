@@ -27,46 +27,27 @@ Rdoc <- R6Class(
         interactive()
       private$include_header <- options$header
       private$get_rdo()
-      private$replace_text_formats()
+      private$format_rdo()
       private$rd_to_text()
       invisible(self)
     },
     show = function(){
 
-      private$list_sections()
-      private$format_sections()
-      private$reflow_sections()
-      private$replace_tables()
-      private$format_code_sections()
-
+      private$set_sections()
       s <- c(private$pkg_header(), private$rd_sections)
 
       if (private$in_term){
         less_ <- Sys.getenv("LESS")
         Sys.setenv(LESS = "-R")
         on.exit(Sys.setenv(LESS = less_))
-        tf <- tempfile(fileext = ".Rtxt")
-        conn <- file(tf, open = "w", encoding = "native.enc")
-        s <- enc2utf8(private$append_(s))
-        writeLines(s, con = conn, useBytes = TRUE)
-        close(conn)
-        file.show(tf)
+        private$show_file(s)
         return(invisible(self))
       }
 
       if (!private$by_section)
         return(private$out_(s))
 
-      n <- length(s)
-      i <- 3L
-      private$out_(s[1L:i])
-      while(i < n){
-        p <- readline("")
-        if (tolower(substr(p, 1L, 1L)) == "q")
-          break
-        i <- i + 1
-        private$out_(s[i])
-      }
+      private$flow_by_section(s)
       invisible(self)
     }
   ),
@@ -86,6 +67,38 @@ Rdoc <- R6Class(
     append_ = function(l) Reduce(append, l)
   )
 )
+
+Rdoc$set("private", "set_sections", function() {
+  private$list_sections()
+  private$format_sections()
+  private$reflow_sections()
+  private$replace_tables()
+  private$format_code_sections()
+  invisible(NULL)
+})
+
+Rdoc$set("private", "show_file", function(s) {
+  tf <- tempfile(fileext = ".Rtxt")
+  conn <- file(tf, open = "w", encoding = "native.enc")
+  s <- enc2utf8(private$append_(s))
+  writeLines(s, con = conn, useBytes = TRUE)
+  close(conn)
+  file.show(tf)
+  invisible(NULL)
+})
+
+Rdoc$set("private", "flow_by_section", function(s) {
+  i <- 3L
+  private$out_(s[1L:i])
+  while (i < length(s)) {
+    p <- readline("")
+    if (tolower(substr(p, 1L, 1L)) == "q")
+      break
+    i <- i + 1
+    private$out_(s[i])
+  }
+  invisible(NULL)
+})
 
 Rdoc$set("private", "get_rdo", function(){
   if (length(self$path) > 1)
@@ -111,20 +124,16 @@ Rdoc$set("private", "rd_to_text", function(){
   invisible(NULL)
 })
 
-
 Rdoc$set("private", "list_sections", function(){
-  o <- private$rd_txt
+  o <- set_rd_title(private$rd_txt)
   h <- id_headers(o)
-  o[h] <- as_title(o[h])
-  nms <- tolower(o[h])
+  o[h] <- set_section_title(o[h])
 
-  section_ends <- c(h[-1] - 1, length(o))
-  sections <- lapply(seq_along(h), function(i) {
-    o[h[i]:section_ends[i]]
-  })
-  names(sections) <- nms
+  rng <- Map(`:`, h, c(h[-1L] - 1L, length(o)))
+  sections <- lapply(rng, function(d) o[d] )
+  names(sections) <- c("title", tolower(o[h[-1L]]))
 
-  if (isTRUE(self$which %in% nms))
+  if (isTRUE(self$which %in% names(sections)))
     sections <- sections[self$which]
 
   private$rd_sections <- sections
@@ -136,13 +145,11 @@ Rdoc$set("private", "format_sections", function() {
     return(invisible(NULL))
 
   o <- private$rd_sections
-  i <- 1
-  if (length(o) > 1) {
-    o[[1]][1] <- self$style$title(o[[1]][1])
-    i <- 2
-  }
+  if (!is.null(o$title))
+    o$title[1] <- self$style$title(o$title[1])
 
-  o[i:length(o)] <- lapply(o[i:length(o)], function(d) {
+  k <- !names(o) %in% "title"
+  o[k] <- lapply(o[k], function(d) {
     d[1] <- self$style$section_titles(d[1])
     d
   })
@@ -200,12 +207,12 @@ Rdoc$set("private", "format_code_sections", function(){
   invisible(NULL)
 })
 
-Rdoc$set("private", "replace_text_formats", function(){
-  if (private$has_color){
-    x <- format_rdo(private$rdo, self$text_formats)
-    private$rdo <- x$rdo
-    private$tables <- x$tables
-  }
+Rdoc$set("private", "format_rdo", function() {
+  if (!private$has_color)
+    return(invisible(NULL))
+  x <- format_rdo(private$rdo, self$text_formats)
+  private$rdo <- x$rdo
+  private$tables <- x$tables
   invisible(NULL)
 })
 

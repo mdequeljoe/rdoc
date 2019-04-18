@@ -39,7 +39,7 @@ reflow_lines <- function(x, exclude = NULL) {
       s <- spaces(strip_style(x_))
       s <- s[s <= open_space]
       if (length(s)) {
-        s <- sx[which(s == max(s))]
+        s <- sx[s == max(s)]
         x[i] <- paste(x[i], substr(x_, 1, s - 1L))
         x[i + 1] <-
           paste0(ind(x[i + 1]),

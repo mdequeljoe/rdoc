@@ -8,12 +8,22 @@ id_headers <- function(rdtxt){
   which(grepl("^([[:punct:]]?)_\\b", rdtxt))
 }
 
-as_title <- function(h){
+set_section_title <- function(h){
   gsub("_\b|:", "", h)
 }
 
 set_styles <- function(l){
   lapply(l, function(x) if (is.null(x)) function(x) x else x)
+}
+
+# long titles may get cut by width via rd2txt
+set_rd_title <- function(o){
+  x <- min(which(!grepl("_\b", o))) - 1L
+  if (x == 1L)
+    return(o)
+  x <- 1L:x
+  title <- paste( o[x] , collapse = " ")
+  c(title, o[-x])
 }
 
 format_args <- function(x, f){

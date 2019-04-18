@@ -166,6 +166,6 @@ format_rdo <-
       o
     }
 
-   fm <- format_rdo_(l)
-   list(rdo = fm, tables = tabular)
+   l <- format_rdo_(l)
+   list(rdo = l, tables = tabular)
   }
