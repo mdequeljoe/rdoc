@@ -103,6 +103,13 @@ Rdoc$set("private", "flow_by_section", function(s) {
 Rdoc$set("private", "get_rdo", function(){
   if (length(self$path) > 1)
     private$select_path()
+
+  if (is_rd_file(self$path)){
+    self$pkg <- self$path
+    private$rdo <- tools::parse_Rd(self$path)
+    return(invisible(NULL))
+  }
+
   self$pkg <- get_pkg(self$path)
   private$rdo <- private$get_help_file(self$path)
   invisible(NULL)

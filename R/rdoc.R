@@ -81,6 +81,22 @@ rdoc_details <- rd_("details")
 #' @export
 rdoc_examples <- rd_("examples")
 
+
+#' Colourised \R documentation
+#'
+#' Refer directly to .Rd file contents as terminal output.
+#'
+#' @param path character(1), the path to an .Rd file
+#'
+#' @inherit rdoc details
+#' @export
+rdoc_rd <- function(path){
+  stopifnot(file.exists(path), is_rd_file(path))
+  topic <- tools::file_path_sans_ext(basename(path))
+  d <- Rdoc$new(topic, path)
+  d$show()
+}
+
 #' Colourised \R documentation
 #'
 #' Refer to colourised \R docs as terminal output. Provides a
