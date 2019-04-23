@@ -36,19 +36,18 @@ rdoc_style <- function(title = crayon::bold,
 #' = rdoc_text_formats())}
 #' @param r_logo \R symbol
 #' @param pkg \pkg{pkg} references
-#' @param inline_code inline code, options to pass to the \code{style} argument of
-#'   \code{prettycode::highlight}
+#' @param inline_code inline code, options to pass to the \code{style} argument
+#'   of \code{prettycode::highlight} as a list of functions.
 #' @param italic italic font
 #' @param bold bold font
-#' @param table tabular, options to pass to \code{cli::boxx}
+#' @param table tabular, options to pass to \code{cli::boxx} as a list.
 #' @param email email
 #' @param url url
 #' @param href href
-#' @details All inputs must either be a function, a list of functions
-#'    (\code{inline_code} and \code{table}), or NULL. Functions must take and return
-#'   a character vector. If set as NULL, the relevant text will
-#'   be displayed using the defaults of \code{tools::Rd2txt} or the calling function
-#'   it is passed to.
+#' @details The input will generally be a function, unless otherwise indicated
+#'   above. Functions must take and return a character vector. If set as NULL,
+#'   the relevant text will be displayed using the defaults of
+#'   \code{tools::Rd2txt} or the calling function it is passed to.
 #' @export
 rdoc_text_formats <-
   function(r_logo = crayon::combine_styles("bold", "blue"),
@@ -58,8 +57,8 @@ rdoc_text_formats <-
            italic = crayon::italic,
            bold = crayon::bold,
            table = list(float = "center",
-                         border_style = "double-single",
-                         align = "left"),
+                        border_style = "single",
+                        align = "left"),
            email = NULL,
            url = NULL,
            href = NULL) {

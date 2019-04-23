@@ -8,22 +8,21 @@ rdoc_text_formats(r_logo = crayon::combine_styles("bold", "blue"),
   pkg = function(x) paste0("{", x, "}"),
   inline_code = prettycode::default_style(), italic = crayon::italic,
   bold = crayon::bold, table = list(float = "center", border_style =
-  "double-single", align = "left"), email = NULL, url = NULL,
-  href = NULL)
+  "single", align = "left"), email = NULL, url = NULL, href = NULL)
 }
 \arguments{
 \item{r_logo}{\R symbol}
 
 \item{pkg}{\pkg{pkg} references}
 
-\item{inline_code}{inline code, options to pass to the \code{style} argument of
-\code{prettycode::highlight}}
+\item{inline_code}{inline code, options to pass to the \code{style} argument
+of \code{prettycode::highlight} as a list of functions.}
 
 \item{italic}{italic font}
 
 \item{bold}{bold font}
 
-\item{table}{tabular, options to pass to \code{cli::boxx}}
+\item{table}{tabular, options to pass to \code{cli::boxx} as a list.}
 
 \item{email}{email}
 
@@ -36,9 +35,8 @@ Set Rd text format defaults to be supplied to \code{options(rdoc.text_formats
 = rdoc_text_formats())}
 }
 \details{
-All inputs must either be a function, a list of functions
-   (\code{inline_code} and \code{table}), or NULL. Functions must take and return
-  a character vector. If set as NULL, the relevant text will
-  be displayed using the defaults of \code{tools::Rd2txt} or the calling function
-  it is passed to.
+The input will generally be a function, unless otherwise indicated
+  above. Functions must take and return a character vector. If set as NULL,
+  the relevant text will be displayed using the defaults of
+  \code{tools::Rd2txt} or the calling function it is passed to.
 }
