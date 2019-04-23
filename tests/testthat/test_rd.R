@@ -60,6 +60,13 @@ test_that("rd_question produces text output", {
 
 })
 
+test_that("Rd files read", {
+  f <- system.file("extdata/rdoc_test.Rd", package = "rdoc")
+  x <- cap_(rdoc_rd(f))
+  expect_true(length(x) > 0L)
+  expect_true(is.character(x))
+})
+
 # test_that("rdoc overrides ?", {
 #   use_rdoc()
 #   expect_true("rdoc" %in% searchpaths())

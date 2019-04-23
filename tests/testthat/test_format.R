@@ -1,4 +1,4 @@
-context("text formatting")
+context("formatting")
 
 test_that("argument formatting", {
   at_ <- function(x)
@@ -16,5 +16,14 @@ test_that("argument formatting", {
                "@...>: dots")
   expect_equal(format_args("na.rm: rm na", at_),
                "@na.rm>: rm na")
+
+})
+
+test_that("rdo formats", {
+
+  f <- system.file("extdata/rdoc_test.Rd", package = "rdoc")
+  x <- tools::parse_Rd(f)
+  x <- rdoc:::format_rdo(x)
+  expect_equal(length(x$tables), 1)
 
 })

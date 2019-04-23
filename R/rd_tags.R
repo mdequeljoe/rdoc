@@ -6,16 +6,16 @@ tag_ <- function(l, default = character(1)) {
   x
 }
 
-get_subtags <- function(l) {
-  subtag_ <- function(l) {
+subtags_ <- function(l) {
+  stag <- function(l) {
     lapply(l, function(d) {
       if (is.list(d) && length(d))
-        subtag_(d)
+        stag(d)
       else
         tag_(d)
     })
   }
-  l <- subtag_(l)
+  l <- stag(l)
   unlist(l)
 }
 
@@ -46,12 +46,10 @@ apply_fmt <- function(l, f) {
 #   put("*")
 # },
 
-format_tag <- function(l, f, tag = "\\special", as_list = TRUE) {
+format_tag <- function(l, f, tag = "\\special") {
   if (is.null(f))
     return(l)
   l <- apply_fmt(l, f)
-  if (!as_list)
-    l <- unlist(l, recursive = FALSE)
   attr(l, "Rd_tag") <- tag
   l
 }
@@ -59,7 +57,7 @@ format_tag <- function(l, f, tag = "\\special", as_list = TRUE) {
 format_inline_code <-
   function(l, styles = prettycode::default_style()) {
 
-    if (!all(get_subtags(l) == "RCODE"))
+    if (!all(subtags_(l) == "RCODE"))
       return(l)
 
     # encode string to avoid cases like

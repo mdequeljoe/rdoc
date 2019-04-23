@@ -10,6 +10,7 @@ Rdoc <- R6Class(
     text_formats = NULL,
     item_bullet = NULL,
     which = NULL,
+    rd_sections = NULL,
     initialize = function(topic,
                           path,
                           which = NULL,
@@ -33,13 +34,10 @@ Rdoc <- R6Class(
     },
     show = function(){
 
-      private$set_sections()
-      s <- c(private$pkg_header(), private$rd_sections)
+      self$set_rd_sections()
+      s <- c(private$pkg_header(), self$rd_sections)
 
       if (private$in_term){
-        less_ <- Sys.getenv("LESS")
-        Sys.setenv(LESS = "-R")
-        on.exit(Sys.setenv(LESS = less_))
         private$show_file(s)
         return(invisible(self))
       }
@@ -57,7 +55,6 @@ Rdoc <- R6Class(
     rdo = NULL, #hold the Rd object
     tables = NULL, #formatted tables
     rd_txt = NULL, #the output text
-    rd_sections = NULL,
     rd_fmt = NULL,
     by_section = TRUE,
     include_header = TRUE,
@@ -68,7 +65,9 @@ Rdoc <- R6Class(
   )
 )
 
-Rdoc$set("private", "set_sections", function() {
+Rdoc$set("public", "set_rd_sections", function() {
+  if (!is.null(self$rd_sections))
+    return(invisible(NULL))
   private$list_sections()
   private$format_sections()
   private$reflow_sections()
@@ -78,6 +77,9 @@ Rdoc$set("private", "set_sections", function() {
 })
 
 Rdoc$set("private", "show_file", function(s) {
+  less_ <- Sys.getenv("LESS")
+  Sys.setenv(LESS = "-R")
+  on.exit(Sys.setenv(LESS = less_))
   tf <- tempfile(fileext = ".Rtxt")
   conn <- file(tf, open = "w", encoding = "native.enc")
   s <- enc2utf8(private$append_(s))
@@ -143,7 +145,7 @@ Rdoc$set("private", "list_sections", function(){
   if (isTRUE(self$which %in% names(sections)))
     sections <- sections[self$which]
 
-  private$rd_sections <- sections
+  self$rd_sections <- sections
   invisible(NULL)
 })
 
@@ -151,7 +153,7 @@ Rdoc$set("private", "format_sections", function() {
   if (!private$has_color)
     return(invisible(NULL))
 
-  o <- private$rd_sections
+  o <- self$rd_sections
   if (!is.null(o$title))
     o$title[1] <- self$style$title(o$title[1])
 
@@ -164,24 +166,27 @@ Rdoc$set("private", "format_sections", function() {
   if (length(o$arguments))
     o$arguments <- format_args(o$arguments, self$style$arguments)
 
-  private$rd_sections <- o
+  self$rd_sections <- o
   invisible(NULL)
 })
 
 Rdoc$set("private", "reflow_sections", function(){
   if (!private$has_color)
     return(invisible(NULL))
-  txt <- !names(private$rd_sections) %in% private$code_sections
+  txt <- !names(self$rd_sections) %in% private$code_sections
   if (length(txt))
-    private$rd_sections[txt] <-
-      lapply(private$rd_sections[txt], reflow_lines, exclude = "##>>RDOC_")
+    self$rd_sections[txt] <-
+      lapply(
+        self$rd_sections[txt],
+        reflow_lines,
+        exclude = "##>>RDOC_|[0-9+]\\.")
   invisible(NULL)
 })
 
 Rdoc$set("private", "replace_tables", function() {
   if (!length(private$tables))
     return(invisible(NULL))
-  private$rd_sections <- lapply(private$rd_sections, function(d) {
+  self$rd_sections <- lapply(self$rd_sections, function(d) {
     tb <- grepl("##>>RDOC_TABLE", d)
     d[tb] <- vapply(d[tb], function(x) {
       id <- gsub(".+_([0-9]+)$", "\\1", x)
@@ -199,7 +204,7 @@ Rdoc$set("private", "format_code_sections", function(){
 
   fm <- lapply(private$code_sections, function(d){
 
-    if (is.null(s <- private$rd_sections[[d]]))
+    if (is.null(s <- self$rd_sections[[d]]))
       return(NULL)
 
     #todo: partial highlighting - avoid text chunks (## ... ##)
@@ -209,7 +214,7 @@ Rdoc$set("private", "format_code_sections", function(){
       error = function(e) s[rng],
       warning = function(w) s[rng]
     )
-    private$rd_sections[[d]] <<- s
+    self$rd_sections[[d]] <<- s
   })
   invisible(NULL)
 })

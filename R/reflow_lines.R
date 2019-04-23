@@ -52,7 +52,7 @@ reflow_lines <- function(x, exclude = NULL) {
 }
 
 nchar2 <- function(x) nchar(strip_style(x))
-any_blank <- function(x) any(!nzchar(x))
+any_blank <- function(x) any(!nzchar(trimws(x)))
 rx <- function() "^([[:blank:]]+)?(.+)"
 ind <- function(x) sub(rx(), "\\1", x)
 rm_ind <- function(x) sub(rx(), "\\2", x)
