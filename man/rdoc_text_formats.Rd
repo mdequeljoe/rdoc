@@ -8,7 +8,9 @@ rdoc_text_formats(r_logo = crayon::combine_styles("bold", "blue"),
   pkg = function(x) paste0("{", x, "}"),
   inline_code = prettycode::default_style(), italic = crayon::italic,
   bold = crayon::bold, table = list(float = "center", border_style =
-  "single", align = "left"), email = NULL, url = NULL, href = NULL)
+  "single", align = "left"), email = crayon::underline,
+  url = crayon::underline, href = crayon::underline,
+  link = function(x) x)
 }
 \arguments{
 \item{r_logo}{\R symbol}
@@ -18,17 +20,19 @@ rdoc_text_formats(r_logo = crayon::combine_styles("bold", "blue"),
 \item{inline_code}{inline code, options to pass to the \code{style} argument
 of \code{prettycode::highlight} as a list of functions.}
 
-\item{italic}{italic font}
+\item{italic}{\emph{italic} font}
 
-\item{bold}{bold font}
+\item{bold}{\bold{bold} font}
 
 \item{table}{tabular, options to pass to \code{cli::boxx} as a list.}
 
-\item{email}{email}
+\item{email}{email formats}
 
-\item{url}{url}
+\item{url}{url references}
 
 \item{href}{href}
+
+\item{link}{links}
 }
 \description{
 Set Rd text format defaults to be supplied to \code{options(rdoc.text_formats
@@ -36,7 +40,9 @@ Set Rd text format defaults to be supplied to \code{options(rdoc.text_formats
 }
 \details{
 The input will generally be a function, unless otherwise indicated
-  above. Functions must take and return a character vector. If set as NULL,
-  the relevant text will be displayed using the defaults of
-  \code{tools::Rd2txt} or the calling function it is passed to.
+  above. Functions must take and return a character vector. If set as
+  \code{NULL}, the relevant text will be displayed using the defaults of
+  \code{tools::Rd2txt} or the calling function it is passed to. Note that
+  href and link formatting refer to the source reference which will otherwise
+  be excluded by \code{tools::Rd2txt}.
 }

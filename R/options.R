@@ -38,16 +38,19 @@ rdoc_style <- function(title = crayon::bold,
 #' @param pkg \pkg{pkg} references
 #' @param inline_code inline code, options to pass to the \code{style} argument
 #'   of \code{prettycode::highlight} as a list of functions.
-#' @param italic italic font
-#' @param bold bold font
+#' @param italic \emph{italic} font
+#' @param bold \bold{bold} font
 #' @param table tabular, options to pass to \code{cli::boxx} as a list.
-#' @param email email
-#' @param url url
+#' @param email email formats
+#' @param url url references
 #' @param href href
+#' @param link links
 #' @details The input will generally be a function, unless otherwise indicated
-#'   above. Functions must take and return a character vector. If set as NULL,
-#'   the relevant text will be displayed using the defaults of
-#'   \code{tools::Rd2txt} or the calling function it is passed to.
+#'   above. Functions must take and return a character vector. If set as
+#'   \code{NULL}, the relevant text will be displayed using the defaults of
+#'   \code{tools::Rd2txt} or the calling function it is passed to. Note that
+#'   href and link formatting refer to the source reference which will otherwise
+#'   be excluded by \code{tools::Rd2txt}.
 #' @export
 rdoc_text_formats <-
   function(r_logo = crayon::combine_styles("bold", "blue"),
@@ -59,9 +62,10 @@ rdoc_text_formats <-
            table = list(float = "center",
                         border_style = "single",
                         align = "left"),
-           email = NULL,
-           url = NULL,
-           href = NULL) {
+           email = crayon::underline,
+           url = crayon::underline,
+           href = crayon::underline,
+           link = function(x) x) {
     out <- list(
       r_logo = r_logo,
       pkg = pkg,
@@ -70,7 +74,8 @@ rdoc_text_formats <-
       bold = bold,
       email = email,
       url = url,
-      href = href
+      href = href,
+      link = link
     )
     stopifnot(is_valid_opt(out))
     stopifnot(is.list(table))

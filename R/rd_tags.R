@@ -54,6 +54,30 @@ format_tag <- function(l, f, tag = "\\special") {
   l
 }
 
+format_href <- function(l, f){
+  if (is.null(f))
+    return(l)
+  s <- subtags_(l)
+  l <- unlist(l)
+  href <- f(l[s == "VERB"])
+  href <- sprintf("[%s](%s)", l[s == "TEXT"], href)
+  attr(href, "Rd_tag") <- "TEXT"
+  href
+}
+
+format_link <- function(l, f){
+  if (is.null(f))
+    return(l)
+
+  src <- f(attr(l, "Rd_option"))
+  if (is.null(src))
+    return(l)
+
+  link <- sprintf("[%s](%s)", unlist(l), src)
+  attr(link, "Rd_tag") <- "TEXT"
+  link
+}
+
 format_inline_code <-
   function(l, styles = prettycode::default_style()) {
 
@@ -98,7 +122,7 @@ format_table <- function(l, box_options = NULL) {
   v <- strsplit(v, "\n")
   if (!is.null(box_options))
     v <- c(v, box_options)
-  do.call(boxx, v)[]
+  do.call(cli::boxx, v)[]
 }
 
 # format rdo
@@ -159,7 +183,10 @@ format_rdo <-
         return(format_tag(o, opts$url))
 
       if (tag_(o) == "\\href")
-        return(format_tag(o, opts$href))
+        return(format_href(o, opts$href))
+
+      if (tag_(o) == "\\link")
+        return(format_link(o, opts$link))
 
       o
     }
