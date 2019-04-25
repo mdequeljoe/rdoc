@@ -9,14 +9,34 @@ rdoc = `help` + `tools::Rd2txt` + [cli](https://github.com/r-lib/cli) + [crayon]
 ![](man/img/rdoc.png)
 
 
-Whilst primarily intended for usage in a terminal, `rdoc` can also be used sensibly elsewhere (such as Rstudio) whereby the output will be printed by sections to avoid flooding it with too much text.
+`rdoc` can also be used in console sessions whereby the output will be interactively printed by section to avoid flooding it with too much text. Any keypress except the 'Q' key will show the next doc section.
+
+![](man/img/console.png)
 
 ## install
 
-(work in progress)
 ```r
 devtools::install_github("mdequeljoe/rdoc")
 ```
+## setting style options
+
+text formatting can be set with `rdoc_text_formats` and then set via `options`
+
+```r
+library(crayon)
+pkg <- combine_styles(bold, cyan)
+options(rdoc.text_formats = rdoc_text_formats(pkg = pkg))
+```
+similarly, setting the overall style of the doc can be set with `rdoc_style`
+
+```r
+format_args <- function(x) paste0("@", x)
+options(rdoc.style = rdoc_style(arguments = format_args))
+```
+
+## .Rd files
+
+Refer directly to .Rd file content with `rdoc_rd`
 
 ## replacing `help` and `?`
 
@@ -31,4 +51,8 @@ Returning to the base functions is possible with:
 ```r
 rdoc::rm_rdoc()
 ```
+
+## contributing
+
+contributions/suggestions welcome!
 
