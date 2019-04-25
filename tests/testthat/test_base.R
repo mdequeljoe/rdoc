@@ -2,6 +2,7 @@ context("base R docs")
 get_help_file <- getFromNamespace(".getHelpFile", "utils")
 options(rdoc.header = FALSE)
 options(rdoc.by_section = FALSE)
+options(rdoc.text_formats = rdoc_text_formats(href = NULL, link = NULL))
 get_rdo <- function(topic, pkg){
   d <- as.call(list(utils::`help`, topic, pkg))
   d <- eval(d)[1]

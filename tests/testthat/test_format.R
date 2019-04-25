@@ -24,6 +24,27 @@ test_that("rdo formats", {
   f <- system.file("extdata/rdoc_test.Rd", package = "rdoc")
   x <- tools::parse_Rd(f)
   x <- rdoc:::format_rdo(x)
+  expect_true(is.list(x$rdo))
   expect_equal(length(x$tables), 1)
 
+})
+
+test_that("setting rd titles", {
+
+  ttl <- function(x) {
+    paste0("_\b", paste0(strsplit(x, "")[[1]]),
+           collapse = "")
+  }
+
+  o <- c(ttl("a long title"),
+         ttl("split into multiple lines"),
+         "",
+         ttl("first section"),
+         "",
+         "some text")
+  x <- set_rd_title(o)
+  x <- gsub("_\b", "", x)
+  expect_equal(x[1], "a long title split into multiple lines")
+  expect_equal(x[2], "")
+  expect_equal(x[3], "first section")
 })

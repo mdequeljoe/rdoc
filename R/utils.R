@@ -32,3 +32,8 @@ format_args <- function(x, f){
   x[arg] <- gsub(rx, paste0("\\1", f("\\2"), "\\3"), x[arg])
   x
 }
+
+append_list <- function(l) Reduce(append, l)
+
+send_out <- function(s, file = "")
+  cat(append_list(s), file = file, sep = "\n")

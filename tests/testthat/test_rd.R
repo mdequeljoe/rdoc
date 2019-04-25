@@ -11,6 +11,7 @@ test_ <- function(x){
 
 test_that("rd produces text output", {
 
+  expect_true(is.function(rd_()))
   x <- cap_(rdoc("min"))
   test_(x)
 
@@ -67,11 +68,11 @@ test_that("Rd files read", {
   expect_true(is.character(x))
 })
 
-# test_that("rdoc overrides ?", {
-#   use_rdoc()
-#   expect_true("rdoc" %in% searchpaths())
-#   x <- cap_(?min)
-#   test_(x)
-#   rm_rdoc()
-#   expect_true(!"rdoc" %in% searchpaths())
-# })
+test_that("rdoc overrides ?", {
+  use_rdoc()
+  expect_true("rdoc" %in% searchpaths())
+  expect_true(is.null(use_rdoc()))
+  rm_rdoc()
+  expect_true(!"rdoc" %in% searchpaths())
+  expect_true(is.null(rm_rdoc()))
+})

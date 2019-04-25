@@ -58,6 +58,25 @@ test_that("format inline code", {
 
 })
 
+test_that("format links", {
+  x <- structure(list(structure("adist", Rd_tag = "TEXT")),
+            Rd_tag = "\\link",
+            Rd_option = structure("utils", Rd_tag = "TEXT"))
+  o <- format_link(x, function(x) x)
+  expect_equal(o[1], "[adist](utils)")
+
+  x <- structure(list(structure("range", Rd_tag = "TEXT")), Rd_tag = "\\link")
+  o <- format_link(x, function(x) x)
+  expect_equal(x, o)
+})
+
+test_that("format href", {
+  x <- structure(list(list(structure("http://rstudio.com", Rd_tag = "VERB")),
+                 list(structure("Rstudio", Rd_tag = "TEXT"))), Rd_tag = "\\href")
+  o <- format_href(x, function(x) x)
+  expect_equal(o[1], "[Rstudio](http://rstudio.com)")
+})
+
 test_that("format tables", {
 
   x <-
@@ -76,29 +95,17 @@ test_that("format tables", {
       )
     ), Rd_tag = "\\tabular")
 
-  xt <- format_table(x)
+
+  xt <- format_table(x, list(border_style = "none", width = 20))
   xt <- strsplit(xt, "\n")[[1]]
   expect_equal(xt,
-               c("┌───────────┐",
-                 "│           │",
-                 "│   1   2   │",
-                 "│           │",
-                 "│   3   4   │",
-                 "│           │",
-                 "└───────────┘"
-               ))
-  xt <- format_table(x, list(border_style = "double-single"))
-  xt <- strsplit(xt, "\n")[[1]]
-  expect_equal(xt,
-               c(
-                 "╒═══════════╕",
-                 "│           │",
-                 "│   1   2   │",
-                 "│           │",
-                 "│   3   4   │",
-                 "│           │",
-                 "╘═══════════╛"
-               ))
+               c("             ",
+                 "             ",
+                 "    1   2    ",
+                 "             ",
+                 "    3   4    ",
+                 "             ",
+                 "             "))
 
 })
 

@@ -43,7 +43,7 @@ Rdoc <- R6Class(
       }
 
       if (!private$by_section)
-        return(private$out_(s))
+        return(send_out(s))
 
       private$flow_by_section(s)
       invisible(self)
@@ -59,9 +59,7 @@ Rdoc <- R6Class(
     by_section = TRUE,
     include_header = TRUE,
     code_sections = c("examples", "example", "usage"),
-    get_help_file = getFromNamespace(".getHelpFile", "utils"),
-    out_ = function(s, file = "") cat(private$append_(s), file = file, sep = "\n"),
-    append_ = function(l) Reduce(append, l)
+    get_help_file = getFromNamespace(".getHelpFile", "utils")
   )
 )
 
@@ -77,27 +75,19 @@ Rdoc$set("public", "set_rd_sections", function() {
 })
 
 Rdoc$set("private", "show_file", function(s) {
-  less_ <- Sys.getenv("LESS")
-  Sys.setenv(LESS = "-R")
-  on.exit(Sys.setenv(LESS = less_))
-  tf <- tempfile(fileext = ".Rtxt")
-  conn <- file(tf, open = "w", encoding = "native.enc")
-  s <- enc2utf8(private$append_(s))
-  writeLines(s, con = conn, useBytes = TRUE)
-  close(conn)
-  file.show(tf)
+  show_file(append_list(s))
   invisible(NULL)
 })
 
 Rdoc$set("private", "flow_by_section", function(s) {
   i <- 3L
-  private$out_(s[1L:i])
+  send_out(s[1L:i])
   while (i < length(s)) {
     p <- readline("")
     if (tolower(substr(p, 1L, 1L)) == "q")
       break
     i <- i + 1
-    private$out_(s[i])
+    send_out(s[i])
   }
   invisible(NULL)
 })
@@ -173,7 +163,7 @@ Rdoc$set("private", "format_sections", function() {
 Rdoc$set("private", "reflow_sections", function(){
   if (!private$has_color)
     return(invisible(NULL))
-  txt <- !names(self$rd_sections) %in% private$code_sections
+  txt <- !names(self$rd_sections) %in% c(private$code_sections, "arguments")
   if (length(txt))
     self$rd_sections[txt] <-
       lapply(
@@ -229,25 +219,7 @@ Rdoc$set("private", "format_rdo", function() {
 })
 
 Rdoc$set("private", "select_path", function() {
-  if (interactive()) {
-    id <- 1:length(self$path)
-    p <- paste(id, get_pkg(self$path), sep = ": ")
-    msg <-
-      sprintf(
-        "multiple paths found for topic: %s\n%s\n%s\n",
-        self$topic,
-        paste(p, collapse = "\n"),
-        "enter number to select (or any key for first topic)"
-      )
-    cat(msg)
-    selection <- readline("")
-    s <- substr(selection, 1, 1)
-    if (!s %in% id)
-      s <- 1L
-    self$path <- self$path[s]
-  } else
-    self$path <- self$path[1L]
-
+  self$path <- select_path(self$path, self$topic)
   invisible(NULL)
 })
 
@@ -265,4 +237,38 @@ Rdoc$set("private", "pkg_header", function() {
   )[],
   "")
 })
+
+show_file <- function(s){
+  less_ <- Sys.getenv("LESS")
+  Sys.setenv(LESS = "-R")
+  on.exit(Sys.setenv(LESS = less_))
+  tf <- tempfile(fileext = ".Rtxt")
+  conn <- file(tf, open = "w", encoding = "native.enc")
+  s <- enc2utf8(s)
+  writeLines(s, con = conn, useBytes = TRUE)
+  close(conn)
+  file.show(tf)
+}
+
+select_path <- function(path, topic){
+  s <- 1L
+  if (interactive()) {
+    id <- 1:length(path)
+    p <- paste(id, get_pkg(path), sep = ": ")
+    msg <-
+      sprintf(
+        "multiple paths found for topic: %s\n%s\n%s\n",
+        topic,
+        paste(p, collapse = "\n"),
+        "enter number to select (or any key for first topic)"
+      )
+    cat(msg)
+    selection <- readline("")
+    sl <- substr(selection, 1, 1)
+    if (sl %in% id)
+      s <- as.integer(sl)
+  }
+  path[s]
+}
+
 
