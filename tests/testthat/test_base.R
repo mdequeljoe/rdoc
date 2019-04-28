@@ -2,7 +2,14 @@ context("base R docs")
 get_help_file <- getFromNamespace(".getHelpFile", "utils")
 options(rdoc.header = FALSE)
 options(rdoc.by_section = FALSE)
-options(rdoc.text_formats = rdoc_text_formats(href = NULL, link = NULL))
+text_fmt <- rdoc_text_formats(
+  table = NULL,
+  href = NULL,
+  link = NULL,
+  email = NULL,
+  url = NULL)
+options(rdoc.text_formats = text_fmt)
+
 get_rdo <- function(topic, pkg){
   d <- as.call(list(utils::`help`, topic, pkg))
   d <- eval(d)[1]
@@ -13,13 +20,6 @@ check_original <- function(topic, pkg = NULL) {
   o <- get_rdo(topic, pkg)
   w <- getOption('width')
   capture.output(tools::Rd2txt(o, options = list(width = w)))
-}
-
-check_rd <- function(topic, pkg = NULL) {
-  capture.output(rdoc(
-    topic,
-    package = pkg
-  ))
 }
 
 strip_lines <- function(x) {
@@ -40,7 +40,7 @@ compare_rd <- function(o, k) {
 
 test_topic <- function(fn, pkg = NULL){
   out <- tryCatch(
-    check_rd(fn, pkg),
+    rdoc_text(fn, pkg),
     error = function(e)
       e,
     warning = function(w)

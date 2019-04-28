@@ -1,5 +1,5 @@
 #' @importFrom utils help
-rd_ <- function(which = NULL) {
+rd_ <- function(which = NULL, method = "show") {
   function(topic,
            package = NULL,
            lib.loc = NULL){
@@ -26,7 +26,7 @@ rd_ <- function(which = NULL) {
 
     d <-
       Rdoc$new(topic, help_path, which, rd_opts())
-    d$show()
+    d[[method]]()
   }
 }
 
@@ -81,6 +81,14 @@ rdoc_details <- rd_("details")
 #' @export
 rdoc_examples <- rd_("examples")
 
+
+#' Colourised \R documentation
+#'
+#' Access the underlying rdoc text lines
+#' @inheritParams rdoc
+#' @return character
+#' @export
+rdoc_text <- rd_(method = "rdoc_text")
 
 #' Colourised \R documentation
 #'

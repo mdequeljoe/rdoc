@@ -78,7 +78,6 @@ rdoc_text_formats <-
       link = link
     )
     stopifnot(is_valid_opt(out))
-    stopifnot(is.list(table))
     c(out, table = list(table))
   }
 

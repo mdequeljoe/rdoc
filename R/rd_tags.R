@@ -156,7 +156,7 @@ format_rdo <-
         return(x)
       }
 
-      if (tag_(o) == "\\tabular"){
+      if (tag_(o) == "\\tabular" && !is.null(opts$table)){
         v <- format_table(o, opts$table)
         tabular[length(tabular) + 1] <<- v
         x <- paste0("##>>RDOC_TABLE_", length(tabular))

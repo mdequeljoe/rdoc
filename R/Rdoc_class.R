@@ -42,11 +42,8 @@ Rdoc <- R6Class(
         return(invisible(self))
       }
 
-      if (!private$by_section)
-        return(send_out(s))
-
       private$flow_by_section(s)
-      invisible(self)
+      invisible(NULL)
     }
   ),
   private = list(
@@ -65,13 +62,18 @@ Rdoc <- R6Class(
 
 Rdoc$set("public", "set_rd_sections", function() {
   if (!is.null(self$rd_sections))
-    return(invisible(NULL))
+    return(invisible(self))
   private$list_sections()
   private$format_sections()
   private$reflow_sections()
   private$replace_tables()
   private$format_code_sections()
-  invisible(NULL)
+  invisible(self)
+})
+
+Rdoc$set("public", "rdoc_text", function() {
+  self$set_rd_sections()
+  append_list(self$rd_sections)
 })
 
 Rdoc$set("private", "show_file", function(s) {
@@ -80,6 +82,10 @@ Rdoc$set("private", "show_file", function(s) {
 })
 
 Rdoc$set("private", "flow_by_section", function(s) {
+  if (!private$by_section){
+    send_out(s)
+    return(invisible(NULL))
+  }
   i <- 3L
   send_out(s[1L:i])
   while (i < length(s)) {
@@ -163,7 +169,7 @@ Rdoc$set("private", "format_sections", function() {
 Rdoc$set("private", "reflow_sections", function(){
   if (!private$has_color)
     return(invisible(NULL))
-  txt <- !names(self$rd_sections) %in% c(private$code_sections, "arguments")
+  txt <- !names(self$rd_sections) %in% c(private$code_sections)
   if (length(txt))
     self$rd_sections[txt] <-
       lapply(
@@ -210,8 +216,6 @@ Rdoc$set("private", "format_code_sections", function(){
 })
 
 Rdoc$set("private", "format_rdo", function() {
-  if (!private$has_color)
-    return(invisible(NULL))
   x <- format_rdo(private$rdo, self$text_formats)
   private$rdo <- x$rdo
   private$tables <- x$tables
