@@ -39,7 +39,7 @@ Rdoc <- R6Class(
 
       if (private$in_term){
         private$show_file(s)
-        return(invisible(self))
+        return(invisible(NULL))
       }
 
       private$flow_by_section(s)
@@ -49,9 +49,9 @@ Rdoc <- R6Class(
   private = list(
     has_color = NULL,
     in_term = NULL,
-    rdo = NULL, #hold the Rd object
-    tables = NULL, #formatted tables
-    rd_txt = NULL, #the output text
+    rdo = NULL,
+    tables = NULL,
+    rd_txt = NULL,
     rd_fmt = NULL,
     by_section = TRUE,
     include_header = TRUE,
@@ -122,7 +122,7 @@ Rdoc$set("private", "rd_to_text", function(){
       underline_titles = TRUE,
       width = getOption('width'),
       code_quote = TRUE, # maybe remove
-      item_bullet = self$opts$item_bullet
+      itemBullet = self$item_bullet
     )
   )
   private$rd_txt <- readLines(tmp_)
@@ -145,6 +145,7 @@ Rdoc$set("private", "list_sections", function(){
   invisible(NULL)
 })
 
+#nocov start
 Rdoc$set("private", "format_sections", function() {
   if (!private$has_color)
     return(invisible(NULL))
@@ -183,10 +184,9 @@ Rdoc$set("private", "replace_tables", function() {
   if (!length(private$tables))
     return(invisible(NULL))
   self$rd_sections <- lapply(self$rd_sections, function(d) {
-    tb <- grepl("##>>RDOC_TABLE", d)
+    tb <- grepl(table_id(), d)
     d[tb] <- vapply(d[tb], function(x) {
-      id <- gsub(".+_([0-9]+)$", "\\1", x)
-      private$tables[[as.numeric(id)]]
+      private$tables[[trimws(x)]]
     }, character(1))
     d
   })
@@ -215,15 +215,16 @@ Rdoc$set("private", "format_code_sections", function(){
   invisible(NULL)
 })
 
+Rdoc$set("private", "select_path", function() {
+  self$path <- select_path(self$path, self$topic)
+  invisible(NULL)
+})
+#nocov end
+
 Rdoc$set("private", "format_rdo", function() {
   x <- format_rdo(private$rdo, self$text_formats)
   private$rdo <- x$rdo
   private$tables <- x$tables
-  invisible(NULL)
-})
-
-Rdoc$set("private", "select_path", function() {
-  self$path <- select_path(self$path, self$topic)
   invisible(NULL)
 })
 

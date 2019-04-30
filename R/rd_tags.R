@@ -125,6 +125,9 @@ format_table <- function(l, box_options = NULL) {
   do.call(cli::boxx, v)[]
 }
 
+table_id <- function(n = character(0))
+  paste0("##>>RDOC_TABLE_", n)
+
 # format rdo
 # return formatted rd object as well as list as formatted tables
 # can't replace tables directly since Rd2txt will interfere with
@@ -159,7 +162,7 @@ format_rdo <-
       if (tag_(o) == "\\tabular" && !is.null(opts$table)){
         v <- format_table(o, opts$table)
         tabular[length(tabular) + 1] <<- v
-        x <- paste0("##>>RDOC_TABLE_", length(tabular))
+        x <- sprintf("\n\n%s\n\n", table_id(length(tabular)))
         attr(x, "Rd_tag") <- "TEXT"
         return(x)
       }
@@ -192,5 +195,7 @@ format_rdo <-
     }
 
    l <- format_rdo_(l)
+   if (length(tabular))
+    names(tabular) <- table_id(1:length(tabular))
    list(rdo = l, tables = tabular)
   }

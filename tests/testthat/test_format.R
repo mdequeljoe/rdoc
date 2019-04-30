@@ -48,3 +48,14 @@ test_that("setting rd titles", {
   expect_equal(x[2], "")
   expect_equal(x[3], "first section")
 })
+
+test_that("Rd table spacing passes", {
+  txt <- "\\name{rdoc_test}
+  \\title{table spacing}
+  \\details{
+    \\pkg{foo2} package \\tabular{rr}{
+      1 \\tab 2\\cr3 \\tab 4} \\link[utils]{adist} reference 1
+  }"
+  write(txt, tf <- tempfile(fileext = '.Rd'))
+  expect_output(rdoc_rd(tf))
+})
