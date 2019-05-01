@@ -53,13 +53,6 @@ test_that("line reflow works as expected", {
 
   x <- c("a b c d",
          crayon::red("a b"),
-         "c d")
-
-  x2 <- reflow_lines(x)
-  expect_equal(x2[2], paste(x[2], x[3]))
-
-  x <- c("a b c d",
-         crayon::red("a b"),
          "c d e")
   x2 <- reflow_lines(x)
   expect_equal(x2[2], paste(x[2], "c d"))

@@ -5,9 +5,8 @@ Version: 0.1.0
 Author: person("Matthew", "de Queljoe", email = "matthew.dequeljoe@gmail.com", role = c("aut", "cre")
 Maintainer: Matthew de Queljoe <matthew.dequeljoe@gmail.com>
 Description: Extends `tools::Rd2txt` by adding customisable text and colour formatting to R documentation 
-    contents for terminal or console output. If used in a terminal, output will carried out via `file.show` 
-    otherwise contents will be printed in sections. Formatting is done via crayon<https://cran.r-project.org/web/packages/crayon/index.html>
-    and prettycode<https://cran.r-project.org/web/packages/prettycode/index.html>.
+    contents. If used from a terminal, output will be displayed via `file.show` otherwise contents
+    will be printed in sections. Also provides stand-in replacements for `?` and `help`.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
@@ -21,4 +20,5 @@ Imports:
 RoxygenNote: 6.1.1
 Suggests: 
     testthat,
-    mockery
+    mockery,
+    withr

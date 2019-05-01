@@ -1,15 +1,5 @@
 context("base R docs")
 get_help_file <- getFromNamespace(".getHelpFile", "utils")
-options(rdoc.header = FALSE)
-options(rdoc.by_section = FALSE)
-text_fmt <- rdoc_text_formats(
-  table = NULL,
-  href = NULL,
-  link = NULL,
-  email = NULL,
-  url = NULL)
-options(rdoc.text_formats = text_fmt)
-
 get_rdo <- function(topic, pkg){
   d <- as.call(list(utils::`help`, topic, pkg))
   d <- eval(d)[1]
@@ -19,7 +9,12 @@ get_rdo <- function(topic, pkg){
 check_original <- function(topic, pkg = NULL) {
   o <- get_rdo(topic, pkg)
   w <- getOption('width')
-  capture.output(tools::Rd2txt(o, options = list(width = w)))
+  capture.output(
+    tools::Rd2txt(
+      o,
+      options = list(width = w, itemBullet = ">")
+    )
+  )
 }
 
 strip_lines <- function(x) {
@@ -75,7 +70,24 @@ test_pkg <- function(pkg, partial = FALSE, n = 100L, exclude = NULL) {
 }
 
 test_that("base package docs output without error or warning", {
-  test_pkg("utils", TRUE, 30)
-  test_pkg("base", TRUE, 30, exclude = c("intToUtf8", "utf8ToInt"))
-  test_pkg("stats", TRUE, 30)
+  text_fmt <- rdoc_text_formats(
+    table = NULL,
+    href = NULL,
+    link = NULL,
+    email = NULL,
+    url = NULL
+  )
+  withr::with_options(
+    list(
+      rdoc.header = FALSE,
+      rdoc.by_section = FALSE,
+      rdoc.text_formats = text_fmt,
+      rdoc.item_bullet = ">"
+    ),
+    {
+      test_pkg("utils", TRUE, 30)
+      test_pkg("base", TRUE, 30, exclude = c("intToUtf8", "utf8ToInt"))
+      test_pkg("stats", TRUE, 30)
+    }
+  )
 })
