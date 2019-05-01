@@ -170,7 +170,7 @@ Rdoc$set("private", "format_sections", function() {
 Rdoc$set("private", "reflow_sections", function(){
   if (!private$has_color)
     return(invisible(NULL))
-  txt <- !names(self$rd_sections) %in% c(private$code_sections)
+  txt <- !names(self$rd_sections) %in% private$code_sections
   if (length(txt))
     self$rd_sections[txt] <-
       lapply(

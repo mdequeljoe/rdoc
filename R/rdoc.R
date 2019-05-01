@@ -4,8 +4,10 @@ rd_ <- function(which = NULL, method = "show") {
            package = NULL,
            lib.loc = NULL){
 
-    if (is.function(topic))
-      topic <- as.character(substitute(topic))
+    topic_ <- as.character(substitute(topic))
+    topic <- tryCatch({
+      if (is.function(topic)) topic_ else topic
+    }, error = function(e) topic_)
 
     if (!missing(package)) {
       p <- as.character(substitute(package))
@@ -101,7 +103,7 @@ rdoc_text <- rd_(method = "rdoc_text")
 rdoc_rd <- function(path){
   stopifnot(file.exists(path), is_rd_file(path))
   topic <- tools::file_path_sans_ext(basename(path))
-  d <- Rdoc$new(topic, path)
+  d <- Rdoc$new(topic, path, rd_opts())
   d$show()
 }
 

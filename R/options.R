@@ -99,6 +99,30 @@ rd_opts <- function() {
     by_section = getOption("rdoc.by_section", TRUE),
     style = getOption("rdoc.style", rdoc_style()),
     text_formats = getOption("rdoc.text_formats", rdoc_text_formats()),
-    item_bullet = getOption("rdoc.item_bullet", cli::symbol$bullet)
+    item_bullet = getOption("rdoc.item_bullet", paste0(cli::symbol$circle, " "))
   )
 }
+
+#' rdoc options
+#'
+#' @description
+#'
+#'   Rdoc uses the following \code{options()} to set output:
+#'
+#'   \itemize{ \item `rdoc.by_section`: logical, output printed by sections for
+#'   console sessions. Default is TRUE.
+#'
+#'   \item `rdoc.header`: logical, whether package header is included in the output.
+#'   Default is TRUE.
+#'
+#'   \item `rdoc.text_formats`: see \code{\link{rdoc_text_formats}}
+#'
+#'   \item `rdoc.style`: see \code{\link{rdoc_style}}
+#'
+#'   \item `rdoc.item_bullet`: Symbol to use for itemized lists.
+#'   Default is \code{paste0(cli::symbol$circle, " ")}
+#' }
+#' @docType package
+#' @name rdoc_options
+NULL
+
