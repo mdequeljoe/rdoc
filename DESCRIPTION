@@ -1,8 +1,8 @@
 Package: rdoc
 Type: Package
-Title: Colourised R documentation
+Title: Colourised R Documentation
 Version: 0.1.0
-Author: person("Matthew", "de Queljoe", email = "matthew.dequeljoe@gmail.com", role = c("aut", "cre")
+Authors@R: person("Matthew", "de Queljoe", email = "matthew.dequeljoe@gmail.com", role = c("aut", "cre"))
 Maintainer: Matthew de Queljoe <matthew.dequeljoe@gmail.com>
 Description: Extends `tools::Rd2txt` by adding customisable text and colour formatting to R documentation 
     contents. If used from a terminal, output will be displayed via `file.show` otherwise contents
