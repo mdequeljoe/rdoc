@@ -28,3 +28,8 @@ Set Rd output formatting styles to be supplied to \code{options(rdoc.style =
 all inputs should be functions or \code{NULL} with the exception of
   \code{code_style} which should be a list of functions.
 }
+\examples{
+\dontrun{
+options(rdoc.style = rdoc::rdoc_style(arguments = crayon::italic))
+}
+}

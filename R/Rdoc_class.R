@@ -9,24 +9,26 @@ Rdoc <- R6Class(
     style = NULL,
     text_formats = NULL,
     item_bullet = NULL,
-    which = NULL,
+    which_section = NULL,
     rd_sections = NULL,
+    width = NULL,
     initialize = function(topic,
                           path,
-                          which = NULL,
-                          options = rd_opts()) {
+                          which_section = NULL,
+                          opts = rd_opts()) {
       self$topic <- topic
       self$path <- path
-      self$which <- which
-      self$style <- set_styles(options$style)
-      self$text_formats <- options$text_formats
-      self$item_bullet <- options$item_bullet
+      self$which_section <- which_section
+      self$style <- set_styles(opts$style)
+      self$text_formats <- opts$text_formats
+      self$item_bullet <- opts$item_bullet
+      self$width <- opts$width
       private$has_color <- crayon::has_color()
       private$in_term <- isatty(stdout())
       private$by_section <- !private$in_term &&
-        options$by_section &&
+        opts$by_section &&
         interactive()
-      private$include_header <- options$header
+      private$include_header <- opts$header
       private$get_rdo()
       private$format_rdo()
       private$rd_to_text()
@@ -35,14 +37,13 @@ Rdoc <- R6Class(
     show = function(){
 
       self$set_rd_sections()
-      s <- c(private$pkg_header(), self$rd_sections)
 
       if (private$in_term){
-        private$show_file(s)
+        private$show_file(self$rd_sections)
         return(invisible(NULL))
       }
 
-      private$flow_by_section(s)
+      private$flow_by_section(self$rd_sections)
       invisible(NULL)
     }
   ),
@@ -68,6 +69,7 @@ Rdoc$set("public", "set_rd_sections", function() {
   private$reflow_sections()
   private$replace_tables()
   private$format_code_sections()
+  private$set_pkg_header()
   invisible(self)
 })
 
@@ -89,8 +91,8 @@ Rdoc$set("private", "flow_by_section", function(s) {
   i <- 3L
   send_out(s[1L:i])
   while (i < length(s)) {
-    p <- readline("")
-    if (tolower(substr(p, 1L, 1L)) == "q")
+    l <- readline("")
+    if (l != "")
       break
     i <- i + 1
     send_out(s[i])
@@ -104,6 +106,8 @@ Rdoc$set("private", "get_rdo", function(){
 
   if (is_rd_file(self$path)){
     self$pkg <- self$path
+    if (nchar(self$pkg) >= (self$width - 5L))
+      self$pkg <- basename(self$pkg)
     private$rdo <- tools::parse_Rd(self$path)
     return(invisible(NULL))
   }
@@ -115,13 +119,14 @@ Rdoc$set("private", "get_rdo", function(){
 
 Rdoc$set("private", "rd_to_text", function(){
   tmp_ <- tempfile(fileext = ".txt")
+  on.exit(unlink(tmp_))
   Rd2txt(
     private$rdo,
     out = tmp_,
     options = list(
       underline_titles = TRUE,
-      width = getOption('width'),
-      code_quote = TRUE, # maybe remove
+      width = self$width,
+      code_quote = TRUE,
       itemBullet = self$item_bullet
     )
   )
@@ -138,8 +143,8 @@ Rdoc$set("private", "list_sections", function(){
   sections <- lapply(rng, function(d) o[d] )
   names(sections) <- c("title", tolower(o[h[-1L]]))
 
-  if (isTRUE(self$which %in% names(sections)))
-    sections <- sections[self$which]
+  if (isTRUE(self$which_section %in% names(sections)))
+    sections <- sections[self$which_section]
 
   self$rd_sections <- sections
   invisible(NULL)
@@ -193,6 +198,7 @@ Rdoc$set("private", "replace_tables", function() {
   invisible(NULL)
 })
 
+#todo: partial highlighting - avoid text chunks (## ... ##)
 Rdoc$set("private", "format_code_sections", function(){
 
   if (!private$has_color)
@@ -203,7 +209,6 @@ Rdoc$set("private", "format_code_sections", function(){
     if (is.null(s <- self$rd_sections[[d]]))
       return(NULL)
 
-    #todo: partial highlighting - avoid text chunks (## ... ##)
     rng <- 2:length(s)
     s[rng] <- tryCatch(
       prettycode::highlight(s[rng], style = self$style$code_style),
@@ -228,26 +233,30 @@ Rdoc$set("private", "format_rdo", function() {
   invisible(NULL)
 })
 
-Rdoc$set("private", "pkg_header", function() {
+Rdoc$set("private", "set_pkg_header", function() {
   if (!private$include_header)
-    return(character(0))
+    return(invisible(NULL))
   left_ <- if (is.null(self$pkg))
     self$topic
   else
     sprintf("%s {%s}", self$topic, self$pkg)
-  c(cli::rule(
+  h <- cli::rule(
     left = left_,
     right = self$text_formats$r_logo("rdoc"),
-    width = getOption('width')
-  )[],
-  "")
+    width = self$width
+  )[]
+  self$rd_sections <- c(h, " ", self$rd_sections)
+  return(invisible(NULL))
 })
 
 show_file <- function(s){
   less_ <- Sys.getenv("LESS")
   Sys.setenv(LESS = "-R")
-  on.exit(Sys.setenv(LESS = less_))
   tf <- tempfile(fileext = ".Rtxt")
+  on.exit({
+    Sys.setenv(LESS = less_)
+    unlink(tf)
+  })
   conn <- file(tf, open = "w", encoding = "native.enc")
   s <- enc2utf8(s)
   writeLines(s, con = conn, useBytes = TRUE)

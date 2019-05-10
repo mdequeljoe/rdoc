@@ -3,7 +3,7 @@
 \name{use_rdoc}
 \alias{use_rdoc}
 \alias{rm_rdoc}
-\title{Colourised R documentation}
+\title{Base replacements}
 \usage{
 use_rdoc()
 

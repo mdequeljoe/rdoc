@@ -21,3 +21,6 @@ character
 \description{
 Access the underlying rdoc text lines
 }
+\examples{
+txt <- rdoc::rdoc_text('min')
+}

@@ -8,17 +8,18 @@
 \description{
 Rdoc uses the following \code{options()} to set output:
 
-  \itemize{ \item `rdoc.by_section`: logical, output printed by sections for
-  console sessions. Default is TRUE.
+\itemize{ \item `rdoc.by_section`: logical, output interactively printed by
+sections for console sessions. Sections will be printed with the <enter>
+keypress. Any other keypress will exit the interaction without printing the
+remaining sections. Default is TRUE.
 
-  \item `rdoc.header`: logical, whether package header is included in the output.
-  Default is TRUE.
+\item `rdoc.header`: logical, whether package header is included in the
+output. Default is TRUE.
 
-  \item `rdoc.text_formats`: see \code{\link{rdoc_text_formats}}
+\item `rdoc.text_formats`: see \code{\link{rdoc_text_formats}}
 
-  \item `rdoc.style`: see \code{\link{rdoc_style}}
+\item `rdoc.style`: see \code{\link{rdoc_style}}
 
-  \item `rdoc.item_bullet`: Symbol to use for itemized lists.
-  Default is \code{paste0(cli::symbol$circle, " ")}
-}
+\item `rdoc.item_bullet`: Symbol to use for itemized lists. Default is
+\code{paste0(cli::symbol$circle, " ")} }
 }

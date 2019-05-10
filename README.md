@@ -9,7 +9,9 @@ rdoc = `help` + `tools::Rd2txt` + [cli](https://github.com/r-lib/cli) + [crayon]
 ![](man/img/rdoc.png)
 
 
-`rdoc` can also be used in console sessions whereby the output will be interactively printed by section to avoid flooding it with too much text. Any keypress except the 'Q' key will show the next doc section.
+`rdoc` can also be used in console sessions whereby the output will be interactively printed by section to avoid flooding it with too much text. The `<enter>` keypress will
+print the next section and any other keypress will exit the interaction without printing
+the remaining sections. This can be disabled via `options` (see below).
 
 ![](man/img/console.png)
 
@@ -18,27 +20,29 @@ rdoc = `help` + `tools::Rd2txt` + [cli](https://github.com/r-lib/cli) + [crayon]
 ```r
 devtools::install_github("mdequeljoe/rdoc")
 ```
-## setting style options
+## options
 
-text formatting can be set with `rdoc_text_formats` and then set via `options`
-
-```r
-library(crayon)
-pkg <- combine_styles(bold, cyan)
-options(rdoc.text_formats = rdoc_text_formats(pkg = pkg))
-```
-similarly, setting the overall style of the doc can be set with `rdoc_style`
+Customising `rdoc` output is possible via `options`:
 
 ```r
-format_args <- function(x) paste0("@", x)
-options(rdoc.style = rdoc_style(arguments = format_args))
+# text formats - defaults to rdoc_text_formats()
+options(rdoc.text_formats = rdoc::rdoc_text_formats(pkg = crayon::cyan))
+
+# doc style - defaults to rdoc_style()
+options(rdoc.style = rdoc::rdoc_style(arguments = function(x) paste0("@", x)))
+
+# item bullet style to pass to tools::Rd2txt
+options(rdoc.item_bullet = ">> ")
+
+#whether to include a package header, defaults to TRUE
+options(rdoc.header = FALSE)
+
+#whether output be split by sections for non-terminal usage, defaults to TRUE
+options(rdoc.by_section = FALSE)
+
 ```
 
-## .Rd files
-
-Refer directly to .Rd file content with `rdoc_rd`
-
-## replacing `help` and `?`
+## base replacements
 
 `help` and `?` can be overridden via:
 
@@ -46,7 +50,7 @@ Refer directly to .Rd file content with `rdoc_rd`
 rdoc::use_rdoc()
 ```
 
-Returning to the base functions is possible with:
+Resetting is possible with:
 
 ```r
 rdoc::rm_rdoc()

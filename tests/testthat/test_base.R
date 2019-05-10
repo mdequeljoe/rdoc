@@ -85,9 +85,9 @@ test_that("base package docs output without error or warning", {
       rdoc.item_bullet = ">"
     ),
     {
-      test_pkg("utils", TRUE, 30)
-      test_pkg("base", TRUE, 30, exclude = c("intToUtf8", "utf8ToInt"))
-      test_pkg("stats", TRUE, 30)
+      test_pkg("utils", TRUE, 10)
+      test_pkg("base", TRUE, 10, exclude = c("intToUtf8", "utf8ToInt"))
+      test_pkg("stats", TRUE, 10)
     }
   )
 })

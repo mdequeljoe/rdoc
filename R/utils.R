@@ -12,6 +12,7 @@ set_section_title <- function(h){
   gsub("_\b|:", "", h)
 }
 
+# takes into account NULL options for overall style
 set_styles <- function(l){
   lapply(l, function(x) if (is.null(x)) function(x) x else x)
 }

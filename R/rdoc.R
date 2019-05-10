@@ -47,16 +47,17 @@ rd_ <- function(which = NULL, method = "show") {
 #'
 #' @details The manner in which content is outputted depends on where it is
 #'   being used. If used from a terminal the contents will be outputted via
-#'   \code{file.show}. Otherwise the output will be printed by sections unless
-#'   this has been disabled via \code{options(rdoc.by_section = FALSE)}. When
-#'   printing by section pressing any key will print out the next section.
-#'   Exiting out early is possible via 'q' keypress. Color support is checked
-#'   via \code{crayon::has_color()}. The output styles can be modified via
-#'   \code{rdoc_style()} and passing this to the option:
-#'   \code{options(rdoc.style = rdoc_style())}
+#'   \code{file.show}. Otherwise the output will be printed interactively by
+#'   sections unless this has been disabled via \code{options(rdoc.by_section =
+#'   FALSE)}. When printing by section pressing the <enter> keypress will show
+#'   the next section. Any other keypress will exit the interaction without
+#'   printing any remaining sections. Color support is checked via
+#'   \code{crayon::has_color()}. Customising rdoc output is possible via
+#'   `options`, see \code{\link{rdoc_options}} for more details.
 #'
 #' @examples \dontrun{
 #'
+#' library(rdoc)
 #' rdoc("rdoc")
 #' rdoc_examples("min")
 #' rdoc_usage(substr)
@@ -89,6 +90,8 @@ rdoc_examples <- rd_("examples")
 #' Access the underlying rdoc text lines
 #' @inheritParams rdoc
 #' @return character
+#' @examples
+#' txt <- rdoc::rdoc_text('min')
 #' @export
 rdoc_text <- rd_(method = "rdoc_text")
 
@@ -99,6 +102,11 @@ rdoc_text <- rd_(method = "rdoc_text")
 #' @param path character(1), the path to an .Rd file
 #'
 #' @inherit rdoc details
+#' @examples \dontrun{
+#' d <- system.file('extdata/rdoc_test.Rd', package = "rdoc")
+#' rdoc::rdoc_rd(d)
+#' }
+#'
 #' @export
 rdoc_rd <- function(path){
   stopifnot(file.exists(path), is_rd_file(path))
@@ -117,7 +125,7 @@ rdoc_rd <- function(path){
 #' @importFrom utils ?
 #' @examples \dontrun{
 #'
-#' rdoc_question(lapply)
+#' rdoc::rdoc_question('lapply')
 #'
 #' }
 #' @export
@@ -146,7 +154,7 @@ rdoc_question <- function(type, topic) {
   d$show()
 }
 
-#' Colourised R documentation
+#' Base replacements
 #'
 #' rdoc replacements for \code{?} and \code{help}
 #'

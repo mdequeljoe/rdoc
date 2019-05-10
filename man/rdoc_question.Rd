@@ -33,18 +33,18 @@ override in \code{use_rdoc()}
 \details{
 The manner in which content is outputted depends on where it is
   being used. If used from a terminal the contents will be outputted via
-  \code{file.show}. Otherwise the output will be printed by sections unless
-  this has been disabled via \code{options(rdoc.by_section = FALSE)}. When
-  printing by section pressing any key will print out the next section.
-  Exiting out early is possible via 'q' keypress. Color support is checked
-  via \code{crayon::has_color()}. The output styles can be modified via
-  \code{rdoc_style()} and passing this to the option:
-  \code{options(rdoc.style = rdoc_style())}
+  \code{file.show}. Otherwise the output will be printed interactively by
+  sections unless this has been disabled via \code{options(rdoc.by_section =
+  FALSE)}. When printing by section pressing the <enter> keypress will show
+  the next section. Any other keypress will exit the interaction without
+  printing any remaining sections. Color support is checked via
+  \code{crayon::has_color()}. Customising rdoc output is possible via
+  `options`, see \code{\link{rdoc_options}} for more details.
 }
 \examples{
 \dontrun{
 
-rdoc_question(lapply)
+rdoc::rdoc_question('lapply')
 
 }
 }
