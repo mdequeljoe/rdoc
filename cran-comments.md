@@ -1,3 +1,12 @@
+## Resubmission
+
+This is a resubmission in which the following changes have been made:
+
+* Ensuring all exported objects have documentation
+* adding '()' to function names and removing their quotation marks
+* replacing \dontrun with \donttest where required
+* adding URL and BugReports field to DESCRIPTION
+
 ## Test environments
 
 * local macOS Mojave 10.14, R 3.6.0

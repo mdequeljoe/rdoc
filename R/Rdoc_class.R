@@ -1,6 +1,5 @@
-#' @importFrom tools Rd2txt
-#' @importFrom R6 R6Class
-Rdoc <- R6Class(
+
+Rdoc <- R6::R6Class(
   "Rdoc",
   public = list(
     topic = NULL,
@@ -120,7 +119,7 @@ Rdoc$set("private", "get_rdo", function(){
 Rdoc$set("private", "rd_to_text", function(){
   tmp_ <- tempfile(fileext = ".txt")
   on.exit(unlink(tmp_))
-  Rd2txt(
+  tools::Rd2txt(
     private$rdo,
     out = tmp_,
     options = list(

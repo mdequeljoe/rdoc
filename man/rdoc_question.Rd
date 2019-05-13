@@ -42,7 +42,7 @@ The manner in which content is outputted depends on where it is
   `options`, see \code{\link{rdoc_options}} for more details.
 }
 \examples{
-\dontrun{
+\donttest{
 
 rdoc::rdoc_question('lapply')
 

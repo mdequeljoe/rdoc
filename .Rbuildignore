@@ -3,3 +3,4 @@
 ^\.Rproj\.user$
 ^src/\.vscode$
 ^cran-comments\.md$
+^CRAN-RELEASE$

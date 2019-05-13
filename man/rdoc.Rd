@@ -6,7 +6,6 @@
 \alias{rdoc_arguments}
 \alias{rdoc_details}
 \alias{rdoc_examples}
-\alias{rd_examples}
 \title{Colourised \R documentation}
 \usage{
 rdoc(topic, package = NULL, lib.loc = NULL)
@@ -45,7 +44,7 @@ The manner in which content is outputted depends on where it is
   `options`, see \code{\link{rdoc_options}} for more details.
 }
 \examples{
-\dontrun{
+\donttest{
 
 library(rdoc)
 rdoc("rdoc")

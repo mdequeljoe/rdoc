@@ -29,7 +29,7 @@ all inputs should be functions or \code{NULL} with the exception of
   \code{code_style} which should be a list of functions.
 }
 \examples{
-\dontrun{
+\donttest{
 options(rdoc.style = rdoc::rdoc_style(arguments = crayon::italic))
 }
 }

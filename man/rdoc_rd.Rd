@@ -24,7 +24,7 @@ The manner in which content is outputted depends on where it is
   `options`, see \code{\link{rdoc_options}} for more details.
 }
 \examples{
-\dontrun{
+\donttest{
 d <- system.file('extdata/rdoc_test.Rd', package = "rdoc")
 rdoc::rdoc_rd(d)
 }

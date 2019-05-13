@@ -18,8 +18,7 @@ and \code{utils::help} with \code{rdoc}
 These replacements can be unset by calling \code{rm_rdoc()}.
 }
 \examples{
-\dontrun{
-
+\donttest{
 rdoc::use_rdoc()
 ?help
 rdoc::rm_rdoc()
