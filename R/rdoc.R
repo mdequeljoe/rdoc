@@ -161,8 +161,11 @@ rdoc_question <- function(type, topic) {
 #' @aliases use_rdoc
 #' @details
 #' Calling \code{use_rdoc()} will override \code{utils::`?`} with \code{rdoc_question}
-#' and \code{utils::help} with \code{rdoc}
-#' These replacements can be unset by calling \code{rm_rdoc()}.
+#' and \code{utils::help} with \code{rdoc}. As a convenience, \code{use_rdoc()} loads \pkg{utils} first.
+#' This ensures that if \code{use_rdoc()} is set in an .Rprofile the replacements will stay ahead of
+#' \pkg{utils} in the search path after startup is finished.
+#' These replacements can be unset by calling \code{rm_rdoc()} (note that no detachment will
+#' occur for \pkg{utils} here).
 #' @examples \donttest{
 #' rdoc::use_rdoc()
 #' ?help
@@ -179,14 +182,18 @@ use_rdoc <- function(){
   e <- new.env()
   e$`?` <- rdoc_question
   e$help <- rdoc
+
+  base::library('utils')
   base::attach(e, name = "rdoc", warn.conflicts = FALSE)
 }
 
 #' @rdname use_rdoc
 #' @export
 rm_rdoc <- function(){
+
   if (!"rdoc" %in% search())
     return(invisible(NULL))
+
   base::detach("rdoc")
 }
 
