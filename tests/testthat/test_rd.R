@@ -56,8 +56,8 @@ test_that("rd_question produces text output", {
     x <- cap_(rdoc_question(min))
     test_(x)
 
-    x <- cap_(rdoc_question(base::min))
-    test_(x)
+    # x <- cap_(rdoc_question(base::min))
+    # test_(x)
 
     x <- cap_(rdoc_question("min"))
     test_(x)
@@ -81,8 +81,20 @@ test_that("Rd files read", {
 test_that("rdoc overrides ?", {
   use_rdoc()
   expect_true("rdoc" %in% searchpaths())
-  expect_true(is.null(use_rdoc()))
   rm_rdoc()
   expect_true(!"rdoc" %in% searchpaths())
-  expect_true(is.null(rm_rdoc()))
+})
+
+
+test_that('rdoc finds help', {
+   h <- find_function('help', exclude = "devtools_shims|rdoc")
+   expect_identical(h, utils::help)
+
+   use_rdoc()
+   h <- find_help(exclude = "devtools_shims|rdoc")
+   expect_identical(h, utils::help)
+
+   h <- find_help(exclude = NULL)
+   expect_identical(h, rdoc)
+
 })

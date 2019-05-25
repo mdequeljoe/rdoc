@@ -18,7 +18,8 @@ Imports:
   cli,
   prettycode,
   tools,
-  utils
+  utils,
+  methods
 RoxygenNote: 6.1.1
 Suggests: 
     testthat,

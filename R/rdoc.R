@@ -16,20 +16,54 @@ rd_ <- function(which = NULL, method = "show") {
     }
 
     k <- as.call(list(
-      utils::`help`,
+      find_help(),
       topic,
       package,
       lib.loc
     ))
+
     k <- tryCatch(eval(k), error = function(e) e)
     if (!length(k))
       return(k)
-    help_path <- k[1L:length(k)]
+
+    help_path <- set_help_path(k)
 
     d <-
       Rdoc$new(topic, help_path, which, rd_opts())
     d[[method]]()
   }
+}
+
+# find the closest help that is not rdoc's help
+find_help <- function(f = c("help", "?"), exclude = "rdoc") {
+  f <- match.arg(f)
+  find_function(f, exclude)
+}
+
+find_function <- function(f, exclude = NULL){
+  pkg <-
+    vapply(methods::findFunction(f),
+           attr,
+           character(1),
+           "name")
+
+  if (!is.null(exclude)){
+    exclude <- grepl(exclude, pkg)
+    if (all(exclude))
+      return()
+    pkg <- pkg[!exclude]
+  }
+
+  get(f, pkg[1])
+}
+
+
+set_help_path <- function(x) {
+
+  if (inherits(x, 'dev_topic'))
+    return(x[][['path']])
+
+  x[1:length(x)]
 }
 
 #' Colourised \R documentation
@@ -65,7 +99,6 @@ rd_ <- function(which = NULL, method = "show") {
 #' }
 #' @export
 rdoc <- rd_()
-
 
 #' @rdname rdoc
 #' @export
@@ -121,7 +154,6 @@ rdoc_rd <- function(path){
 #' override in \code{use_rdoc()}
 #' @inherit rdoc details
 #' @inheritParams utils::`?`
-#' @importFrom utils ?
 #' @examples \donttest{
 #'
 #' rdoc::rdoc_question('lapply')
@@ -132,17 +164,18 @@ rdoc_question <- function(type, topic) {
   type <- substitute(type)
   topic <- substitute(topic)
 
+  f <- find_help("?")
   if (missing(topic)) {
     topic <- type
-    k <- as.call(list(utils::`?`, topic))
-  } else {
-    k <- as.call(list(utils::`?`, type, topic))
-  }
+    k <- as.call(list(f, topic))
+  } else
+    k <- as.call(list(f, type, topic))
 
   k <- tryCatch(eval(k), error = function(e) e)
   if (!length(k))
     return(k)
-  help_path <- k[1L:length(k)]
+
+  help_path <- set_help_path(k)
   topic <- as.character(topic)
   topic <- topic[length(topic)]
 
@@ -174,11 +207,9 @@ rdoc_question <- function(type, topic) {
 #' }
 #'
 #' @export
-use_rdoc <- function(){
-
+use_rdoc <- function() {
   if ("rdoc" %in% search())
-    return(invisible(NULL))
-
+    rm_rdoc()
   e <- new.env()
   e$`?` <- rdoc_question
   e$help <- rdoc
