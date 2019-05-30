@@ -4,16 +4,14 @@ rd_ <- function(which = NULL, method = "show") {
            package = NULL,
            lib.loc = NULL){
 
-    topic_ <- as.character(substitute(topic))
-    topic <- tryCatch({
-      if (is.function(topic)) topic_ else topic
-    }, error = function(e) topic_)
-
-    if (!missing(package)) {
-      p <- as.character(substitute(package))
-      if (p %in% loadedNamespaces())
-        package <- p
+    topic <- topic %char% as.character(substitute(topic))
+    if (topic[1] == "::") {
+      package <- topic[2]
+      topic <- topic[3]
     }
+
+    if (!missing(package))
+      package <- package %char% as.character(substitute(package))
 
     k <- as.call(list(
       find_help(),
@@ -21,49 +19,11 @@ rd_ <- function(which = NULL, method = "show") {
       package,
       lib.loc
     ))
-
-    k <- tryCatch(eval(k), error = function(e) e)
-    if (!length(k))
-      return(k)
-
-    help_path <- set_help_path(k)
-
+    k <- set_help(k, topic)
     d <-
-      Rdoc$new(topic, help_path, which, rd_opts())
+      Rdoc$new(k$topic, k$help_path, which, rd_opts())
     d[[method]]()
   }
-}
-
-# find the closest help that is not rdoc's help
-find_help <- function(f = c("help", "?"), exclude = "rdoc") {
-  f <- match.arg(f)
-  find_function(f, exclude)
-}
-
-find_function <- function(f, exclude = NULL){
-  pkg <-
-    vapply(methods::findFunction(f),
-           attr,
-           character(1),
-           "name")
-
-  if (!is.null(exclude)){
-    exclude <- grepl(exclude, pkg)
-    if (all(exclude))
-      return()
-    pkg <- pkg[!exclude]
-  }
-
-  get(f, pkg[1])
-}
-
-
-set_help_path <- function(x) {
-
-  if (inherits(x, 'dev_topic'))
-    return(x[][['path']])
-
-  x[1:length(x)]
 }
 
 #' Colourised \R documentation
@@ -115,7 +75,6 @@ rdoc_details <- rd_("details")
 #' @rdname rdoc
 #' @export
 rdoc_examples <- rd_("examples")
-
 
 #' Colourised \R documentation
 #'
@@ -170,18 +129,10 @@ rdoc_question <- function(type, topic) {
     k <- as.call(list(f, topic))
   } else
     k <- as.call(list(f, type, topic))
-
-  k <- tryCatch(eval(k), error = function(e) e)
-  if (!length(k))
-    return(k)
-
-  help_path <- set_help_path(k)
-  topic <- as.character(topic)
-  topic <- topic[length(topic)]
-
+  k <- set_help(k, topic)
   d <-
-    Rdoc$new(topic,
-             help_path,
+    Rdoc$new(k$topic,
+             k$help_path,
              rd_opts())
   d$show()
 }

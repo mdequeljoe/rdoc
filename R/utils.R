@@ -1,3 +1,7 @@
+
+`%char%` <- function(a, b)
+  tryCatch({if (is.character(a)) a else b}, error = function(e) b)
+
 get_pkg <- function(path)
   basename(dirname(dirname(path)))
 
